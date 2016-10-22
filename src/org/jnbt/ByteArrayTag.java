@@ -47,6 +47,7 @@ import java.util.stream.IntStream;
  *
  * @author Graham Edgecombe
  */
+@SuppressWarnings({"AssignmentToCollectionOrArrayFieldFromParameter", "ReturnOfCollectionOrArrayField"})
 public final class ByteArrayTag extends Tag {
 	private final byte[] value;
 
@@ -72,7 +73,9 @@ public final class ByteArrayTag extends Tag {
 	@Override
 	public int hashCode() {
 		return Objects.hash(super.hashCode(), value);
-	}	@Override
+	}
+
+	@Override
 	public String toString() {
 		String joinedHexValues = byteArrayStream(value)
 				.mapToObj(ByteArrayTag::toHexByte)
@@ -87,5 +90,5 @@ public final class ByteArrayTag extends Tag {
 	private static String toHexByte(int b) {
 		String hex = Integer.toHexString(b & 0xFF);
 		return hex.length() == 1 ? '0' + hex : hex;
-	} 
+	}
 }

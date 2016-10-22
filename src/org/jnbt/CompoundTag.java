@@ -37,7 +37,6 @@ package org.jnbt;
 
 //@formatter:on
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -48,6 +47,7 @@ import java.util.stream.Collectors;
  *
  * @author Graham Edgecombe
  */
+@SuppressWarnings({"AssignmentToCollectionOrArrayFieldFromParameter", "ReturnOfCollectionOrArrayField"})
 public final class CompoundTag extends Tag {
 	private static final Pattern NEWLINE_PATTERN = Pattern.compile("\n");
 
@@ -55,7 +55,7 @@ public final class CompoundTag extends Tag {
 
 	public CompoundTag(String name, Map<String, Tag> value) {
 		super(name);
-		this.value = Collections.unmodifiableMap(value);
+		this.value = value;
 	}
 
 	@Override
@@ -76,6 +76,7 @@ public final class CompoundTag extends Tag {
 	public int hashCode() {
 		return Objects.hash(super.hashCode(), value);
 	}
+
 	@Override
 	public String toString() {
 		String joinedTags = value.values().stream()
