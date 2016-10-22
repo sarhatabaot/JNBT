@@ -39,36 +39,24 @@ package org.jnbt;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
- * The <code>TAG_List</code> tag.
+ * The {@code TAG_List} tag.
  *
  * @author Graham Edgecombe
  *
  */
 public final class ListTag extends Tag {
+	private static final Pattern NEWLINE_PATTERN = Pattern.compile("\n");
 
 	/**
-	 * The type.
+	 * The type of items in this list.
 	 */
 	private final Class<? extends Tag> type;
-
-	/**
-	 * The value.
-	 */
 	private final List<Tag> value;
 
-	/**
-	 * Creates the tag.
-	 *
-	 * @param name
-	 *            The name.
-	 * @param type
-	 *            The type of item in the list.
-	 * @param value
-	 *            The value.
-	 */
-	public ListTag(final String name, final Class<? extends Tag> type, final List<Tag> value) {
+	public ListTag(String name, Class<? extends Tag> type, List<Tag> value) {
 
 		super(name);
 		this.type = type;
@@ -76,9 +64,7 @@ public final class ListTag extends Tag {
 	}
 
 	/**
-	 * Gets the type of item in this list.
-	 *
-	 * @return The type of item in this list.
+	 * Returns the type of items in this list.
 	 */
 	public Class<? extends Tag> getType() {
 
@@ -94,47 +80,44 @@ public final class ListTag extends Tag {
 	@Override
 	public String toString() {
 
-		final String name = getName();
+		String name = getName();
 		String append = "";
-		if ((name != null) && !name.equals("")) {
+		if ((name != null) && !name.isEmpty()) {
 			append = "(\"" + getName() + "\")";
 		}
-		final StringBuilder bldr = new StringBuilder();
-		bldr.append("TAG_List" + append + ": " + value.size()
-				+ " entries of type " + NBTUtils.getTypeName(type)
-				+ "\n{\n");
-		for (final Tag t : value) {
-			bldr.append("   " + t.toString().replaceAll("\n", "\n   ")
-					+ "\n");
+		StringBuilder bldr = new StringBuilder(64);
+		bldr.append("TAG_List");
+		bldr.append(append);
+		bldr.append(": ");
+		bldr.append(value.size());
+		bldr.append(" entries of type ");
+		bldr.append(NBTUtils.getTypeName(type));
+		bldr.append("\n{\n");
+		for (Tag t : value) {
+			bldr.append("   ");
+			bldr.append(NEWLINE_PATTERN.matcher(t.toString()).replaceAll("\n   "));
+			bldr.append('\n');
 		}
-		bldr.append("}");
+		bldr.append('}');
 		return bldr.toString();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
 	@Override
 	public int hashCode() {
 
-		final int prime = 31;
+		int prime = 31;
 		int result = super.hashCode();
 		result = (prime * result) + ((value == null) ? 0 : value.hashCode());
 		return result;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	@Override
-	public boolean equals(final Object obj) {
+	public boolean equals(Object obj) {
 
 		if (this == obj) { return true; }
 		if (!super.equals(obj)) { return false; }
 		if (!(obj instanceof ListTag)) { return false; }
-		final ListTag other = (ListTag) obj;
+		ListTag other = (ListTag) obj;
 		if (value == null) {
 			if (other.value != null) { return false; }
 		} else if (!value.equals(other.value)) { return false; }

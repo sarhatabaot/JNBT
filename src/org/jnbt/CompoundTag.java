@@ -39,29 +39,20 @@ package org.jnbt;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
- * The <code>TAG_Compound</code> tag.
+ * The {@code TAG_Compound} tag.
  *
  * @author Graham Edgecombe
  *
  */
 public final class CompoundTag extends Tag {
+	private static final Pattern NEWLINE_PATTERN = Pattern.compile("\n");
 
-	/**
-	 * The value.
-	 */
 	private final Map<String, Tag> value;
 
-	/**
-	 * Creates the tag.
-	 *
-	 * @param name
-	 *            The name.
-	 * @param value
-	 *            The value.
-	 */
-	public CompoundTag(final String name, final Map<String, Tag> value) {
+	public CompoundTag(String name, Map<String, Tag> value) {
 
 		super(name);
 		this.value = Collections.unmodifiableMap(value);
@@ -76,47 +67,42 @@ public final class CompoundTag extends Tag {
 	@Override
 	public String toString() {
 
-		final String name = getName();
+		String name = getName();
 		String append = "";
-		if ((name != null) && !name.equals("")) {
+		if ((name != null) && !name.isEmpty()) {
 			append = "(\"" + getName() + "\")";
 		}
-		final StringBuilder bldr = new StringBuilder();
-		bldr.append("TAG_Compound" + append + ": " + value.size()
-				+ " entries\n{\n");
-		for (final Map.Entry<String, Tag> entry : value.entrySet()) {
-			bldr.append("   "
-					+ entry.getValue().toString().replaceAll("\n", "\n   ")
-					+ "\n");
+		StringBuilder bldr = new StringBuilder(64);
+		bldr.append("TAG_Compound");
+		bldr.append(append);
+		bldr.append(": ");
+		bldr.append(value.size());
+		bldr.append(" entries\n{\n");
+		for (Map.Entry<String, Tag> entry : value.entrySet()) {
+			bldr.append("   ");
+			bldr.append(NEWLINE_PATTERN.matcher(entry.getValue().toString()).replaceAll("\n   "));
+			bldr.append('\n');
 		}
-		bldr.append("}");
+		bldr.append('}');
 		return bldr.toString();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
 	@Override
 	public int hashCode() {
 
-		final int prime = 31;
+		int prime = 31;
 		int result = super.hashCode();
 		result = (prime * result) + ((value == null) ? 0 : value.hashCode());
 		return result;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	@Override
-	public boolean equals(final Object obj) {
+	public boolean equals(Object obj) {
 
 		if (this == obj) { return true; }
 		if (!super.equals(obj)) { return false; }
 		if (!(obj instanceof CompoundTag)) { return false; }
-		final CompoundTag other = (CompoundTag) obj;
+		CompoundTag other = (CompoundTag) obj;
 		if (value == null) {
 			if (other.value != null) { return false; }
 		} else if (!value.equals(other.value)) { return false; }

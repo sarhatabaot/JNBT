@@ -40,27 +40,16 @@ package org.jnbt;
 import java.util.Arrays;
 
 /**
- * The <code>TAG_Byte_Array</code> tag.
+ * The {@code TAG_Byte_Array} tag.
  *
  * @author Graham Edgecombe
  *
  */
 public final class ByteArrayTag extends Tag {
 
-	/**
-	 * The value.
-	 */
 	private final byte[] value;
 
-	/**
-	 * Creates the tag.
-	 *
-	 * @param name
-	 *            The name.
-	 * @param value
-	 *            The value.
-	 */
-	public ByteArrayTag(final String name, final byte[] value) {
+	public ByteArrayTag(String name, byte[] value) {
 
 		super(name);
 		this.value = value;
@@ -75,46 +64,38 @@ public final class ByteArrayTag extends Tag {
 	@Override
 	public String toString() {
 
-		final StringBuilder hex = new StringBuilder();
-		for (final byte b : value) {
-			final String hexDigits = Integer.toHexString(b).toUpperCase();
+		StringBuilder hex = new StringBuilder(value.length * 3);
+		for (byte b : value) {
+			String hexDigits = Integer.toHexString(b).toUpperCase();
 			if (hexDigits.length() == 1) {
-				hex.append("0");
+				hex.append('0');
 			}
-			hex.append(hexDigits).append(" ");
+			hex.append(hexDigits).append(' ');
 		}
-		final String name = getName();
+		String name = getName();
 		String append = "";
-		if ((name != null) && !name.equals("")) {
+		if ((name != null) && !name.isEmpty()) {
 			append = "(\"" + getName() + "\")";
 		}
-		return "TAG_Byte_Array" + append + ": " + hex.toString();
+		return "TAG_Byte_Array" + append + ": " + hex;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
 	@Override
 	public int hashCode() {
 
-		final int prime = 31;
+		int prime = 31;
 		int result = super.hashCode();
 		result = (prime * result) + Arrays.hashCode(value);
 		return result;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	@Override
-	public boolean equals(final Object obj) {
+	public boolean equals(Object obj) {
 
 		if (this == obj) { return true; }
 		if (!super.equals(obj)) { return false; }
 		if (!(obj instanceof ByteArrayTag)) { return false; }
-		final ByteArrayTag other = (ByteArrayTag) obj;
+		ByteArrayTag other = (ByteArrayTag) obj;
 		if (!Arrays.equals(value, other.value)) { return false; }
 		return true;
 	}

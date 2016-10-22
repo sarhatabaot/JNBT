@@ -40,27 +40,16 @@ package org.jnbt;
 import java.util.Arrays;
 
 /**
- * The <code>TAG_Byte_Array</code> tag.
+ * The {@code TAG_Byte_Array} tag.
  *
  * @author Jocopa3
  *
  */
 public final class IntArrayTag extends Tag {
 
-	/**
-	 * The value.
-	 */
 	private final int[] value;
 
-	/**
-	 * Creates the tag.
-	 *
-	 * @param name
-	 *            The name.
-	 * @param value
-	 *            The value.
-	 */
-	public IntArrayTag(final String name, final int[] value) {
+	public IntArrayTag(String name, int[] value) {
 
 		super(name);
 		this.value = value;
@@ -75,42 +64,34 @@ public final class IntArrayTag extends Tag {
 	@Override
 	public String toString() {
 
-		final StringBuilder integers = new StringBuilder();
-		for (final int b : value) {
-			integers.append(b).append(" ");
+		StringBuilder integers = new StringBuilder(value.length * 4);
+		for (int b : value) {
+			integers.append(b).append(' ');
 		}
-		final String name = getName();
+		String name = getName();
 		String append = "";
-		if ((name != null) && !name.equals("")) {
+		if ((name != null) && !name.isEmpty()) {
 			append = "(\"" + getName() + "\")";
 		}
-		return "TAG_Int_Array" + append + ": " + integers.toString();
+		return "TAG_Int_Array" + append + ": " + integers;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
 	@Override
 	public int hashCode() {
 
-		final int prime = 31;
+		int prime = 31;
 		int result = super.hashCode();
 		result = (prime * result) + Arrays.hashCode(value);
 		return result;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	@Override
-	public boolean equals(final Object obj) {
+	public boolean equals(Object obj) {
 
 		if (this == obj) { return true; }
 		if (!super.equals(obj)) { return false; }
 		if (!(obj instanceof IntArrayTag)) { return false; }
-		final IntArrayTag other = (IntArrayTag) obj;
+		IntArrayTag other = (IntArrayTag) obj;
 		if (!Arrays.equals(value, other.value)) { return false; }
 		return true;
 	}

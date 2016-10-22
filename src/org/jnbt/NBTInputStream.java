@@ -50,7 +50,7 @@ import java.util.zip.GZIPInputStream;
 /**
  * <p>
  * This class reads <strong>NBT</strong>, or <strong>Named Binary Tag</strong>
- * streams, and produces an object graph of subclasses of the <code>Tag</code>
+ * streams, and produces an object graph of subclasses of the {@code Tag}
  * object.
  * </p>
  *
@@ -60,28 +60,21 @@ import java.util.zip.GZIPInputStream;
  * http://www.minecraft.net/docs/NBT.txt</a>.
  * </p>
  *
- * @author Graham Edgecombe
+ * @author Graham Edgecombe, ensirius
  *
  */
 public final class NBTInputStream implements Closeable {
 
-	/**
-	 * The data input stream.
-	 */
 	private final DataInputStream is;
 
 	/**
-	 * Creates a new <code>NBTInputStream</code>, which will source its data
+	 * Creates a new {@code NBTInputStream}, which will source its data
 	 * from the specified input stream.
 	 *
-	 * @param is
-	 *            The input stream.
 	 * @param gzipped
 	 *            Whether the stream is GZip-compressed.
-	 * @throws IOException
-	 *             if an I/O error occurs.
 	 */
-	public NBTInputStream(InputStream is, final boolean gzipped) throws IOException {
+	public NBTInputStream(InputStream is, boolean gzipped) throws IOException {
 		if (gzipped) {
 			is = new GZIPInputStream(is);
 		}
@@ -89,30 +82,25 @@ public final class NBTInputStream implements Closeable {
 	}
 
 	/**
-	 * Creates a new <code>NBTInputStream</code>, which will source its data
+	 * Creates a new {@code NBTInputStream}, which will source its data
 	 * from the specified GZIP-compressed input stream.
-	 *
-	 * @param is
-	 *            The input stream.
-	 * @throws IOException
-	 *             if an I/O error occurs.
 	 */
-	public NBTInputStream(final InputStream is) throws IOException {
+	public NBTInputStream(InputStream is) throws IOException {
 		this.is = new DataInputStream(new GZIPInputStream(is));
 	}
 
-	//TODO: comment this.  supports raw Gziped data.
-	// author: ensirius
-	public NBTInputStream(final DataInputStream is) {
-                this.is = is;
-        }
+	/**
+	 * Creates a new {@code NBTInputStream}, which will source its data
+	 * from the specified raw input stream.
+	 *
+	 * @since 1.4
+	 */
+	public NBTInputStream(DataInputStream is) {
+		this.is = is;
+	}
 
 	/**
 	 * Reads an NBT tag from the stream.
-	 *
-	 * @return The tag that was read.
-	 * @throws IOException
-	 *             if an I/O error occurs.
 	 */
 	public Tag readTag() throws IOException {
 
@@ -124,22 +112,19 @@ public final class NBTInputStream implements Closeable {
 	 *
 	 * @param depth
 	 *            The depth of this tag.
-	 * @return The tag that was read.
-	 * @throws IOException
-	 *             if an I/O error occurs.
 	 */
-	private Tag readTag(final int depth) throws IOException {
+	private Tag readTag(int depth) throws IOException {
 
-		final int type = is.readByte() & 0xFF;
+		int type = is.readByte() & 0xFF;
 
 		String name;
-		if (type != NBTConstants.TYPE_END) {
-			final int nameLength = is.readShort() & 0xFFFF;
-			final byte[] nameBytes = new byte[nameLength];
+		if (type == NBTConstants.TYPE_END) {
+			name = "";
+		} else {
+			int    nameLength = is.readShort() & 0xFFFF;
+			byte[] nameBytes  = new byte[nameLength];
 			is.readFully(nameBytes);
 			name = new String(nameBytes, NBTConstants.CHARSET);
-		} else {
-			name = "";
 		}
 
 		return readTagPayload(type, name, depth);
@@ -147,18 +132,8 @@ public final class NBTInputStream implements Closeable {
 
 	/**
 	 * Reads the payload of a tag, given the name and type.
-	 *
-	 * @param type
-	 *            The type.
-	 * @param name
-	 *            The name.
-	 * @param depth
-	 *            The depth.
-	 * @return The tag.
-	 * @throws IOException
-	 *             if an I/O error occurs.
 	 */
-	private Tag readTagPayload(final int type, final String name, final int depth)
+	private Tag readTagPayload(int type, String name, int depth)
 			throws IOException
 	{
 
@@ -195,12 +170,12 @@ public final class NBTInputStream implements Closeable {
 					return new StringTag(name, new String(bytes,
 							NBTConstants.CHARSET));
 				case NBTConstants.TYPE_LIST :
-					final int childType = is.readByte();
+					int childType = is.readByte();
 					length = is.readInt();
 
-					final List<Tag> tagList = new ArrayList<Tag>();
+					List<Tag> tagList = new ArrayList<>(32);
 					for (int i = 0; i < length; i++) {
-						final Tag tag = readTagPayload(childType, "", depth + 1);
+						Tag tag = readTagPayload(childType, "", depth + 1);
 						if (tag instanceof EndTag) { throw new IOException(
 								"[JNBT] TAG_End not permitted in a list."); }
 						tagList.add(tag);
@@ -209,9 +184,9 @@ public final class NBTInputStream implements Closeable {
 					return new ListTag(name, NBTUtils.getTypeClass(childType),
 							tagList);
 				case NBTConstants.TYPE_COMPOUND :
-					final Map<String, Tag> tagMap = new HashMap<String, Tag>();
+					Map<String, Tag> tagMap = new HashMap<>(32);
 					while (true) {
-						final Tag tag = readTag(depth + 1);
+						Tag tag = readTag(depth + 1);
 						if (tag instanceof EndTag) {
 							break;
 						} else {
@@ -222,14 +197,14 @@ public final class NBTInputStream implements Closeable {
 					return new CompoundTag(name, tagMap);
 				case NBTConstants.TYPE_INT_ARRAY :
 					length = is.readInt();
-					final int[] ints = new int[length];
+					int[] ints = new int[length];
 					for (int i = 0; i < length; i++) {
 						ints[i] = is.readInt();
 					}
 					return new IntArrayTag(name, ints);
 				default :
 					throw new IOException("[JNBT] Invalid tag type: " + type
-							+ ".");
+					                      + '.');
 			}
 	}
 

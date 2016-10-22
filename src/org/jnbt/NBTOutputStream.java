@@ -48,9 +48,8 @@ import java.util.zip.GZIPOutputStream;
 /**
  * <p>
  * This class writes <strong>NBT</strong>, or <strong>Named Binary Tag</strong>
- * <code>Tag</code> objects to an underlying <code>OutputStream</code>.
+ * {@code Tag} objects to an underlying {@code OutputStream}.
  * </p>
- *
  * <p>
  * The NBT format was created by Markus Persson, and the specification may be
  * found at <a href="http://www.minecraft.net/docs/NBT.txt">
@@ -62,57 +61,37 @@ import java.util.zip.GZIPOutputStream;
  */
 public final class NBTOutputStream implements Closeable {
 
-	/**
-	 * The output stream.
-	 */
 	private final DataOutputStream os;
 
 	/**
-	 * Creates a new <code>NBTOutputStream</code>, which will write data to the
+	 * Creates a new {@code NBTOutputStream}, which will write data to the
 	 * specified underlying output stream, GZip-compressed.
-	 *
-	 * @param os
-	 *            The output stream.
-	 * @throws IOException
-	 *             if an I/O error occurs.
 	 */
-	public NBTOutputStream(final OutputStream os) throws IOException {
+	public NBTOutputStream(OutputStream os) throws IOException {
 
 		this.os = new DataOutputStream(new GZIPOutputStream(os));
 	}
 
 
 	/**
-	 * Creates a new <code>NBTOutputStream</code>, which will write data to the
+	 * Creates a new {@code NBTOutputStream}, which will write data to the
 	 * specified underlying output stream.
 	 *
-	 * @param os
-	 *            The output stream.
 	 * @param gzipped
 	 *            Whether the output stream should be GZip-compressed.
-	 * @throws IOException
-	 *             if an I/O error occurs.
 	 */
-	public NBTOutputStream(OutputStream os, final boolean gzipped) throws IOException {
+	public NBTOutputStream(OutputStream os, boolean gzipped) throws IOException {
 		if (gzipped) {
 			os = new GZIPOutputStream(os);
 		}
 		this.os = new DataOutputStream(os);
 	}
 
-	/**
-	 * Writes a tag.
-	 *
-	 * @param tag
-	 *            The tag to write.
-	 * @throws IOException
-	 *             if an I/O error occurs.
-	 */
-	public void writeTag(final Tag tag) throws IOException {
+	public void writeTag(Tag tag) throws IOException {
 
-		final int type = NBTUtils.getTypeCode(tag.getClass());
-		final String name = tag.getName();
-		final byte[] nameBytes = name.getBytes(NBTConstants.CHARSET);
+		int type = NBTUtils.getTypeCode(tag.getClass());
+		String name = tag.getName();
+		byte[] nameBytes = name.getBytes(NBTConstants.CHARSET);
 
 		os.writeByte(type);
 		os.writeShort(nameBytes.length);
@@ -124,17 +103,9 @@ public final class NBTOutputStream implements Closeable {
 		writeTagPayload(tag);
 	}
 
-	/**
-	 * Writes tag payload.
-	 *
-	 * @param tag
-	 *            The tag.
-	 * @throws IOException
-	 *             if an I/O error occurs.
-	 */
-	private void writeTagPayload(final Tag tag) throws IOException {
+	private void writeTagPayload(Tag tag) throws IOException {
 
-		final int type = NBTUtils.getTypeCode(tag.getClass());
+		int type = NBTUtils.getTypeCode(tag.getClass());
 		switch (type)
 			{
 				case NBTConstants.TYPE_END :
@@ -175,183 +146,122 @@ public final class NBTOutputStream implements Closeable {
 					break;
 				default :
 					throw new IOException("[JNBT] Invalid tag type: " + type
-							+ ".");
+					                      + '.');
 			}
 	}
 
 	/**
-	 * Writes a <code>TAG_Byte</code> tag.
-	 *
-	 * @param tag
-	 *            The tag.
-	 * @throws IOException
-	 *             if an I/O error occurs.
+	 * Writes a {@code TAG_Byte} tag.
 	 */
-	private void writeByteTagPayload(final ByteTag tag) throws IOException {
+	private void writeByteTagPayload(ByteTag tag) throws IOException {
 
 		os.writeByte(tag.getValue());
 	}
 
 	/**
-	 * Writes a <code>TAG_Byte_Array</code> tag.
-	 *
-	 * @param tag
-	 *            The tag.
-	 * @throws IOException
-	 *             if an I/O error occurs.
+	 * Writes a {@code TAG_Byte_Array} tag.
 	 */
-	private void writeByteArrayTagPayload(final ByteArrayTag tag) throws IOException {
+	private void writeByteArrayTagPayload(ByteArrayTag tag) throws IOException {
 
-		final byte[] bytes = tag.getValue();
+		byte[] bytes = tag.getValue();
 		os.writeInt(bytes.length);
 		os.write(bytes);
 	}
 
 	/**
-	 * Writes a <code>TAG_Compound</code> tag.
-	 *
-	 * @param tag
-	 *            The tag.
-	 * @throws IOException
-	 *             if an I/O error occurs.
+	 * Writes a {@code TAG_Compound} tag.
 	 */
-	private void writeCompoundTagPayload(final CompoundTag tag) throws IOException {
+	private void writeCompoundTagPayload(CompoundTag tag) throws IOException {
 
-		for (final Tag childTag : tag.getValue().values()) {
+		for (Tag childTag : tag.getValue().values()) {
 			writeTag(childTag);
 		}
 		os.writeByte((byte) 0); // end tag - better way?
 	}
 
 	/**
-	 * Writes a <code>TAG_List</code> tag.
-	 *
-	 * @param tag
-	 *            The tag.
-	 * @throws IOException
-	 *             if an I/O error occurs.
+	 * Writes a {@code TAG_List} tag.
 	 */
-	private void writeListTagPayload(final ListTag tag) throws IOException {
+	private void writeListTagPayload(ListTag tag) throws IOException {
 
-		final Class<? extends Tag> clazz = tag.getType();
-		final List<Tag> tags = tag.getValue();
-		final int size = tags.size();
+		Class<? extends Tag> clazz = tag.getType();
+		List<Tag> tags = tag.getValue();
+		int size = tags.size();
 
 		os.writeByte(NBTUtils.getTypeCode(clazz));
 		os.writeInt(size);
-		for (int i = 0; i < size; i++) {
-			writeTagPayload(tags.get(i));
+		for (Tag t : tags) {
+			writeTagPayload(t);
 		}
 	}
 
 	/**
-	 * Writes a <code>TAG_String</code> tag.
-	 *
-	 * @param tag
-	 *            The tag.
-	 * @throws IOException
-	 *             if an I/O error occurs.
+	 * Writes a {@code TAG_String} tag.
 	 */
-	private void writeStringTagPayload(final StringTag tag) throws IOException {
+	private void writeStringTagPayload(StringTag tag) throws IOException {
 
-		final byte[] bytes = tag.getValue().getBytes(NBTConstants.CHARSET);
+		byte[] bytes = tag.getValue().getBytes(NBTConstants.CHARSET);
 		os.writeShort(bytes.length);
 		os.write(bytes);
 	}
 
 	/**
-	 * Writes a <code>TAG_Double</code> tag.
-	 *
-	 * @param tag
-	 *            The tag.
-	 * @throws IOException
-	 *             if an I/O error occurs.
+	 * Writes a {@code TAG_Double} tag.
 	 */
-	private void writeDoubleTagPayload(final DoubleTag tag) throws IOException {
+	private void writeDoubleTagPayload(DoubleTag tag) throws IOException {
 
 		os.writeDouble(tag.getValue());
 	}
 
 	/**
-	 * Writes a <code>TAG_Float</code> tag.
-	 *
-	 * @param tag
-	 *            The tag.
-	 * @throws IOException
-	 *             if an I/O error occurs.
+	 * Writes a {@code TAG_Float} tag.
 	 */
-	private void writeFloatTagPayload(final FloatTag tag) throws IOException {
+	private void writeFloatTagPayload(FloatTag tag) throws IOException {
 
 		os.writeFloat(tag.getValue());
 	}
 
 	/**
-	 * Writes a <code>TAG_Long</code> tag.
-	 *
-	 * @param tag
-	 *            The tag.
-	 * @throws IOException
-	 *             if an I/O error occurs.
+	 * Writes a {@code TAG_Long} tag.
 	 */
-	private void writeLongTagPayload(final LongTag tag) throws IOException {
+	private void writeLongTagPayload(LongTag tag) throws IOException {
 
 		os.writeLong(tag.getValue());
 	}
 
 	/**
-	 * Writes a <code>TAG_Int</code> tag.
-	 *
-	 * @param tag
-	 *            The tag.
-	 * @throws IOException
-	 *             if an I/O error occurs.
+	 * Writes a {@code TAG_Int} tag.
 	 */
-	private void writeIntTagPayload(final IntTag tag) throws IOException {
+	private void writeIntTagPayload(IntTag tag) throws IOException {
 
 		os.writeInt(tag.getValue());
 	}
 
 	/**
-	 * Writes a <code>TAG_Short</code> tag.
-	 *
-	 * @param tag
-	 *            The tag.
-	 * @throws IOException
-	 *             if an I/O error occurs.
+	 * Writes a {@code TAG_Short} tag.
 	 */
-	private void writeShortTagPayload(final ShortTag tag) throws IOException {
+	private void writeShortTagPayload(ShortTag tag) throws IOException {
 
 		os.writeShort(tag.getValue());
 	}
 
 	/**
-	 * Writes a <code>TAG_Int_Array</code> tag.
-	 *
-	 * @param tag
-	 *            The tag.
-	 * @throws IOException
-	 *             if an I/O error occurs.
+	 * Writes a {@code TAG_Int_Array} tag.
 	 */
-	private void writeIntArrayTagPayload(final IntArrayTag tag) throws IOException {
+	private void writeIntArrayTagPayload(IntArrayTag tag) throws IOException {
 
-		final int[] ints = tag.getValue();
+		int[] ints = tag.getValue();
 		os.writeInt(ints.length);
-		for (int i = 0; i < ints.length; i++) {
-			os.writeInt(ints[i]);
+		for (int i : ints) {
+			os.writeInt(i);
 		}
 	}
 
 	/**
-	 * Writes a <code>TAG_Empty</code> tag.
-	 *
-	 * @param tag
-	 *            The tag.
-	 * @throws IOException
-	 *             if an I/O error occurs.
+	 * Writes a {@code TAG_Empty} tag.
 	 */
-	private void writeEndTagPayload(final EndTag tag) {
+	private void writeEndTagPayload(EndTag tag) {
 
-		/* empty */
 	}
 
 	@Override
