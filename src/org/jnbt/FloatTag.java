@@ -70,14 +70,4 @@ public final class FloatTag extends Tag {
 	public int hashCode() {
 		return Objects.hash(super.hashCode(), value);
 	}
-
-	@Override
-	public String toString() {
-		String name   = getName();
-		String append = "";
-		if ((name != null) && !name.isEmpty()) {
-			append = "(\"" + getName() + "\")";
-		}
-		return "TAG_Float" + append + ": " + value;
-	}
 }

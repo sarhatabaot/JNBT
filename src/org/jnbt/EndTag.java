@@ -54,6 +54,6 @@ public final class EndTag extends Tag {
 
 	@Override
 	public String toString() {
-		return "TAG_End";
+		return getTagPrefixedToString();
 	}
 }

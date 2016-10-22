@@ -39,6 +39,8 @@ package org.jnbt;
 
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * The {@code TAG_Byte_Array} tag.
@@ -70,23 +72,20 @@ public final class ByteArrayTag extends Tag {
 	@Override
 	public int hashCode() {
 		return Objects.hash(super.hashCode(), value);
+	}	@Override
+	public String toString() {
+		String joinedHexValues = byteArrayStream(value)
+				.mapToObj(ByteArrayTag::toHexByte)
+				.collect(Collectors.joining(", ", "[", "]"));
+		return getTagPrefixedToString(joinedHexValues);
 	}
 
-	@Override
-	public String toString() {
-		StringBuilder hex = new StringBuilder(value.length * 3);
-		for (byte b : value) {
-			String hexDigits = Integer.toHexString(b).toUpperCase();
-			if (hexDigits.length() == 1) {
-				hex.append('0');
-			}
-			hex.append(hexDigits).append(' ');
-		}
-		String name   = getName();
-		String append = "";
-		if ((name != null) && !name.isEmpty()) {
-			append = "(\"" + getName() + "\")";
-		}
-		return "TAG_Byte_Array" + append + ": " + hex;
+	private static IntStream byteArrayStream(byte[] value) {
+		return IntStream.range(0, value.length).map(i -> value[i]);
 	}
+
+	private static String toHexByte(int b) {
+		String hex = Integer.toHexString(b & 0xFF);
+		return hex.length() == 1 ? '0' + hex : hex;
+	} 
 }

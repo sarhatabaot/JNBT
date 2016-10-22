@@ -41,6 +41,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * The {@code TAG_List} tag.
@@ -91,25 +92,10 @@ public final class ListTag extends Tag {
 
 	@Override
 	public String toString() {
-		String name   = getName();
-		String append = "";
-		if ((name != null) && !name.isEmpty()) {
-			append = "(\"" + getName() + "\")";
-		}
-		StringBuilder bldr = new StringBuilder(64);
-		bldr.append("TAG_List");
-		bldr.append(append);
-		bldr.append(": ");
-		bldr.append(value.size());
-		bldr.append(" entries of type ");
-		bldr.append(NBTUtils.getTypeName(type));
-		bldr.append("\n{\n");
-		for (Tag t : value) {
-			bldr.append("   ");
-			bldr.append(NEWLINE_PATTERN.matcher(t.toString()).replaceAll("\n   "));
-			bldr.append('\n');
-		}
-		bldr.append('}');
-		return bldr.toString();
+		String joinedTags = value.stream()
+		                         .map(Tag::toString)
+		                         .map(s -> NEWLINE_PATTERN.matcher(s).replaceAll("\n   "))
+		                         .collect(Collectors.joining("\n", "{\n", "\n}"));
+		return getTagPrefixedToString(NBTUtils.getTypeName(type), joinedTags);
 	}
 }

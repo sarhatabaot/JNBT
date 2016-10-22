@@ -39,6 +39,7 @@ package org.jnbt;
 
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * The {@code TAG_Byte_Array} tag.
@@ -74,15 +75,9 @@ public final class IntArrayTag extends Tag {
 
 	@Override
 	public String toString() {
-		StringBuilder integers = new StringBuilder(value.length * 4);
-		for (int b : value) {
-			integers.append(b).append(' ');
-		}
-		String name   = getName();
-		String append = "";
-		if ((name != null) && !name.isEmpty()) {
-			append = "(\"" + getName() + "\")";
-		}
-		return "TAG_Int_Array" + append + ": " + integers;
+		String joinedValues = Arrays.stream(value)
+		                            .mapToObj(Integer::toString)
+		                            .collect(Collectors.joining(", ", "[", "]"));
+		return getTagPrefixedToString(joinedValues);
 	}
 }

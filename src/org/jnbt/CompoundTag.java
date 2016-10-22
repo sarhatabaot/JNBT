@@ -41,6 +41,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * The {@code TAG_Compound} tag.
@@ -75,26 +76,12 @@ public final class CompoundTag extends Tag {
 	public int hashCode() {
 		return Objects.hash(super.hashCode(), value);
 	}
-
 	@Override
 	public String toString() {
-		String name   = getName();
-		String append = "";
-		if ((name != null) && !name.isEmpty()) {
-			append = "(\"" + getName() + "\")";
-		}
-		StringBuilder bldr = new StringBuilder(64);
-		bldr.append("TAG_Compound");
-		bldr.append(append);
-		bldr.append(": ");
-		bldr.append(value.size());
-		bldr.append(" entries\n{\n");
-		for (Map.Entry<String, Tag> entry : value.entrySet()) {
-			bldr.append("   ");
-			bldr.append(NEWLINE_PATTERN.matcher(entry.getValue().toString()).replaceAll("\n   "));
-			bldr.append('\n');
-		}
-		bldr.append('}');
-		return bldr.toString();
+		String joinedTags = value.values().stream()
+		                         .map(Tag::toString)
+		                         .map(s -> NEWLINE_PATTERN.matcher(s).replaceAll("\n   "))
+		                         .collect(Collectors.joining("\n", "{\n", "\n}"));
+		return getTagPrefixedToString(joinedTags);
 	}
 }

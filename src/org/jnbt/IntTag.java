@@ -70,14 +70,4 @@ public final class IntTag extends Tag {
 	public int hashCode() {
 		return Objects.hash(super.hashCode(), value);
 	}
-
-	@Override
-	public String toString() {
-		String name   = getName();
-		String append = "";
-		if ((name != null) && !name.isEmpty()) {
-			append = "(\"" + getName() + "\")";
-		}
-		return "TAG_Int" + append + ": " + value;
-	}
 }

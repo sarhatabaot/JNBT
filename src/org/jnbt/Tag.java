@@ -69,4 +69,19 @@ public abstract class Tag {
 	public int hashCode() {
 		return Objects.hash(name);
 	}
+
+	@Override
+	public String toString() {
+		return getTagPrefixedToString(getValue().toString());
+	}
+
+	protected String getTagPrefixedToString(String... valueParts) {
+		StringBuilder out = new StringBuilder(32);
+		out.append(getClass().getSimpleName());
+		out.append(name == null ? "" : "(\"" + name + "\")");
+		out.append(": ");
+		for (String valuePart : valueParts)
+			out.append(valuePart);
+		return out.toString();
+	}
 }

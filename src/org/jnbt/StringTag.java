@@ -73,11 +73,6 @@ public final class StringTag extends Tag {
 
 	@Override
 	public String toString() {
-		String name   = getName();
-		String append = "";
-		if ((name != null) && !name.isEmpty()) {
-			append = "(\"" + getName() + "\")";
-		}
-		return "TAG_String" + append + ": " + value;
+		return getTagPrefixedToString("\"", value, "\"");
 	}
 }
