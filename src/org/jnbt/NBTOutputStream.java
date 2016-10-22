@@ -43,6 +43,10 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.zip.GZIPOutputStream;
+import java.util.zip.InflaterOutputStream;
+
+import static org.jnbt.NBTCompression.*;
+import static org.jnbt.NBTConstants.CHARSET;
 
 /**
  * <p>
@@ -63,9 +67,12 @@ public final class NBTOutputStream implements Closeable {
 	/**
 	 * Creates a new {@code NBTOutputStream}, which will write data to the
 	 * specified underlying output stream, GZip-compressed.
+	 *
+	 * @deprecated Use {@link #NBTOutputStream(OutputStream, NBTCompression)} instead;
 	 */
+	@Deprecated
 	public NBTOutputStream(OutputStream os) throws IOException {
-		this.os = new DataOutputStream(new GZIPOutputStream(os));
+		this(os, GZIP);
 	}
 
 	/**
@@ -73,18 +80,43 @@ public final class NBTOutputStream implements Closeable {
 	 * specified underlying output stream.
 	 *
 	 * @param gzipped Whether the output stream should be GZip-compressed.
+	 * @deprecated Use {@link #NBTOutputStream(OutputStream, NBTCompression)} instead;
 	 */
+	@SuppressWarnings("MissingDeprecatedAnnotation")
 	public NBTOutputStream(OutputStream os, boolean gzipped) throws IOException {
-		if (gzipped)
-			this.os = new DataOutputStream(new GZIPOutputStream(os));
-		else
-			this.os = new DataOutputStream(os);
+		this(os, gzipped ? GZIP : UNCOMPRESSED);
+	}
+
+	/**
+	 * Creates a new {@code NBTOutputStream}, which will write data to the
+	 * specified underlying output stream.
+	 *
+	 * @param compression The type of compression the output stream should use.
+	 * @throws IOException if an I/O error occurs.
+	 * @since 1.5
+	 */
+	public NBTOutputStream(OutputStream os, NBTCompression compression) throws IOException {
+		switch (compression) {
+			case UNCOMPRESSED:
+				this.os = new DataOutputStream(os);
+				break;
+			case GZIP:
+				this.os = new DataOutputStream(new GZIPOutputStream(os));
+				break;
+			case ZLIB:
+				this.os = new DataOutputStream(new InflaterOutputStream(os));
+				break;
+			case FROM_BYTE:
+				throw new IllegalArgumentException(FROM_BYTE.name() + " is only for reading.");
+			default:
+				throw new IllegalArgumentException("Unsupported compression type: " + compression);
+		}
 	}
 
 	public void writeTag(Tag tag) throws IOException {
 		int    type      = NBTUtils.getTypeCode(tag.getClass());
 		String name      = tag.getName();
-		byte[] nameBytes = name.getBytes(NBTConstants.CHARSET);
+		byte[] nameBytes = name.getBytes(CHARSET);
 
 		os.writeByte(type);
 		os.writeShort(nameBytes.length);
@@ -185,7 +217,7 @@ public final class NBTOutputStream implements Closeable {
 	 * Writes a {@code TAG_String} tag.
 	 */
 	private void writeStringTagPayload(StringTag tag) throws IOException {
-		byte[] bytes = tag.getValue().getBytes(NBTConstants.CHARSET);
+		byte[] bytes = tag.getValue().getBytes(CHARSET);
 		os.writeShort(bytes.length);
 		os.write(bytes);
 	}

@@ -37,15 +37,16 @@ package org.jnbt;
 
 //@formatter:on
 
-import java.io.Closeable;
-import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
+import java.util.zip.InflaterInputStream;
+
+import static org.jnbt.NBTCompression.*;
+import static org.jnbt.NBTConstants.CHARSET;
 
 /**
  * <p>
@@ -67,23 +68,26 @@ public final class NBTInputStream implements Closeable {
 
 	/**
 	 * Creates a new {@code NBTInputStream}, which will source its data
-	 * from the specified input stream.
+	 * from the specified GZIP-compressed input stream.
 	 *
-	 * @param gzipped Whether the stream is GZip-compressed.
+	 * @deprecated Use {@link #NBTInputStream(InputStream, NBTCompression)} instead;
 	 */
-	public NBTInputStream(InputStream is, boolean gzipped) throws IOException {
-		if (gzipped)
-			this.is = new DataInputStream(new GZIPInputStream(is));
-		else
-			this.is = new DataInputStream(is);
+	@Deprecated
+	public NBTInputStream(InputStream is) throws IOException {
+		this(is, GZIP);
 	}
 
 	/**
 	 * Creates a new {@code NBTInputStream}, which will source its data
-	 * from the specified GZIP-compressed input stream.
+	 * from the specified input stream.
+	 *
+	 * @param gzipped Whether the stream is GZip-compressed.
+	 * @deprecated Use {@link #NBTInputStream(InputStream, NBTCompression)} instead;
 	 */
-	public NBTInputStream(InputStream is) throws IOException {
-		this.is = new DataInputStream(new GZIPInputStream(is));
+	@SuppressWarnings("BooleanParameter")
+	@Deprecated
+	public NBTInputStream(InputStream is, boolean gzipped) throws IOException {
+		this(is, gzipped ? GZIP : UNCOMPRESSED);
 	}
 
 	/**
@@ -91,9 +95,49 @@ public final class NBTInputStream implements Closeable {
 	 * from the specified raw input stream.
 	 *
 	 * @since 1.4
+	 * @deprecated Use {@link #NBTInputStream(InputStream, NBTCompression)} instead;
 	 */
+	@Deprecated
 	public NBTInputStream(DataInputStream is) {
 		this.is = is;
+	}
+
+	/**
+	 * Creates a new {@code NBTInputStream}, which will source its data
+	 * from the specified input stream.
+	 *
+	 * @param compression The type of compression the input stream uses.
+	 * @throws IOException if an I/O error occurs.
+	 * @since 1.5
+	 */
+	public NBTInputStream(InputStream is, NBTCompression compression) throws IOException {
+		NBTCompression resolvedCompression;
+		if (compression == FROM_BYTE) {
+			int compressionByte = is.read();
+			if (compressionByte < 0) {
+				//noinspection NewExceptionWithoutArguments
+				throw new EOFException();
+			}
+			resolvedCompression = fromId(compressionByte);
+		} else {
+			resolvedCompression = compression;
+		}
+
+		switch (resolvedCompression) {
+			case UNCOMPRESSED:
+				this.is = new DataInputStream(is);
+				break;
+			case GZIP:
+				this.is = new DataInputStream(new GZIPInputStream(is));
+				break;
+			case ZLIB:
+				this.is = new DataInputStream(new InflaterInputStream(is));
+				break;
+			case FROM_BYTE:
+				throw new AssertionError();
+			default:
+				throw new IllegalArgumentException("Unsupported compression type: " + compression);
+		}
 	}
 
 	/**
@@ -118,7 +162,7 @@ public final class NBTInputStream implements Closeable {
 			int    nameLength = is.readShort() & 0xFFFF;
 			byte[] nameBytes  = new byte[nameLength];
 			is.readFully(nameBytes);
-			name = new String(nameBytes, NBTConstants.CHARSET);
+			name = new String(nameBytes, CHARSET);
 		}
 
 		return readTagPayload(type, name, depth);
@@ -130,66 +174,114 @@ public final class NBTInputStream implements Closeable {
 	private Tag readTagPayload(int type, String name, int depth) throws IOException {
 		switch (type) {
 			case NBTConstants.TYPE_END:
-				if (depth == 0) {
-					throw new IOException("[JNBT] TAG_End found without a TAG_Compound/TAG_List tag preceding it.");
-				} else {
-					return new EndTag();
-				}
+				return readEndTagPayload(depth);
 			case NBTConstants.TYPE_BYTE:
-				return new ByteTag(name, is.readByte());
+				return readByteTagPayload(name);
 			case NBTConstants.TYPE_SHORT:
-				return new ShortTag(name, is.readShort());
+				return readShortTagPayload(name);
 			case NBTConstants.TYPE_INT:
-				return new IntTag(name, is.readInt());
+				return readIntTagPayload(name);
 			case NBTConstants.TYPE_LONG:
-				return new LongTag(name, is.readLong());
+				return readLongTagPayload(name);
 			case NBTConstants.TYPE_FLOAT:
-				return new FloatTag(name, is.readFloat());
+				return readFloatTagPayload(name);
 			case NBTConstants.TYPE_DOUBLE:
-				return new DoubleTag(name, is.readDouble());
+				return readDoubleTagPayload(name);
 			case NBTConstants.TYPE_BYTE_ARRAY:
-				int length = is.readInt();
-				byte[] bytes = new byte[length];
-				is.readFully(bytes);
-				return new ByteArrayTag(name, bytes);
+				return readByteArrayTagPayload(name);
 			case NBTConstants.TYPE_STRING:
-				length = is.readShort();
-				bytes = new byte[length];
-				is.readFully(bytes);
-				return new StringTag(name, new String(bytes, NBTConstants.CHARSET));
+				return readStringTagPayload(name);
 			case NBTConstants.TYPE_LIST:
-				int childType = is.readByte();
-				length = is.readInt();
-
-				List<Tag> tagList = new ArrayList<>(32);
-				for (int i = 0; i < length; i++) {
-					Tag tag = readTagPayload(childType, "", depth + 1);
-					if (tag instanceof EndTag)
-						throw new IOException("[JNBT] TAG_End not permitted in a list.");
-					tagList.add(tag);
-				}
-				return new ListTag(name, NBTUtils.getTypeClass(childType), tagList);
+				return readListTagPayload(name, depth);
 			case NBTConstants.TYPE_COMPOUND:
-				Map<String, Tag> tagMap = new HashMap<>(32);
-				while (true) {
-					Tag tag = readTag(depth + 1);
-					if (tag instanceof EndTag) {
-						break;
-					} else {
-						tagMap.put(tag.getName(), tag);
-					}
-				}
-				return new CompoundTag(name, tagMap);
+				return readCompoundTagPayload(name, depth);
 			case NBTConstants.TYPE_INT_ARRAY:
-				length = is.readInt();
-				int[] ints = new int[length];
-				for (int i = 0; i < length; i++) {
-					ints[i] = is.readInt();
-				}
-				return new IntArrayTag(name, ints);
+				return readIntArrayPayload(name);
 			default:
 				throw new IOException("[JNBT] Invalid tag type: " + type + '.');
 		}
+	}
+
+	@SuppressWarnings("MethodMayBeStatic")
+	private Tag readEndTagPayload(int depth) throws IOException {
+		if (depth == 0)
+			throw new IOException("[JNBT] TAG_End found without a TAG_Compound/TAG_List tag preceding it.");
+
+		return new EndTag();
+	}
+
+	private Tag readByteTagPayload(String name) throws IOException {
+		return new ByteTag(name, is.readByte());
+	}
+
+	private Tag readShortTagPayload(String name) throws IOException {
+		return new ShortTag(name, is.readShort());
+	}
+
+	private Tag readIntTagPayload(String name) throws IOException {
+		return new IntTag(name, is.readInt());
+	}
+
+	private Tag readLongTagPayload(String name) throws IOException {
+		return new LongTag(name, is.readLong());
+	}
+
+	private Tag readFloatTagPayload(String name) throws IOException {
+		return new FloatTag(name, is.readFloat());
+	}
+
+	private Tag readDoubleTagPayload(String name) throws IOException {
+		return new DoubleTag(name, is.readDouble());
+	}
+
+	private Tag readByteArrayTagPayload(String name) throws IOException {
+		int    length = is.readInt();
+		byte[] bytes  = new byte[length];
+		is.readFully(bytes);
+		return new ByteArrayTag(name, bytes);
+	}
+
+	private Tag readStringTagPayload(String name) throws IOException {
+		int    length = is.readShort();
+		byte[] bytes  = new byte[length];
+		is.readFully(bytes);
+		String string = new String(bytes, CHARSET);
+		return new StringTag(name, string);
+	}
+
+	private Tag readListTagPayload(String name, int depth) throws IOException {
+		int       typeByte = is.readByte();
+		int       length   = is.readInt();
+		List<Tag> tagList  = new ArrayList<>(length);
+		for (int i = 0; i < length; i++) {
+			Tag tag = readTagPayload(typeByte, "", depth + 1);
+			if (tag instanceof EndTag)
+				throw new IOException("[JNBT] TAG_End not permitted in a list.");
+			tagList.add(tag);
+		}
+		Class<? extends Tag> typeClass = NBTUtils.getTypeClass(typeByte);
+		return new ListTag(name, typeClass, tagList);
+	}
+
+	private Tag readCompoundTagPayload(String name, int depth) throws IOException {
+		Map<String, Tag> tagMap = new HashMap<>(32);
+		while (true) {
+			Tag tag = readTag(depth + 1);
+			if (tag instanceof EndTag)
+				break;
+
+			tagMap.put(tag.getName(), tag);
+		}
+		return new CompoundTag(name, tagMap);
+	}
+
+	private Tag readIntArrayPayload(String name) throws IOException {
+		int   length = is.readInt();
+		int[] ints   = new int[length];
+		for (int i = 0; i < length; i++)
+			ints[i] = is.readInt();
+
+		return new IntArrayTag(name, ints);
 	}
 
 	@Override
