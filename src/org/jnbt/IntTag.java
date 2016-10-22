@@ -53,9 +53,12 @@ public final class IntTag extends Tag {
 	}
 
 	@Override
-	public Integer getValue() {
-		return value;
-	}
+	public Integer getValue() { return value; }
+
+	/**
+	 * Returns the value without autoboxing.
+	 */
+	public int intValue() { return value; }
 
 	@Override
 	public boolean equals(Object obj) {

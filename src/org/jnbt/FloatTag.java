@@ -53,9 +53,12 @@ public final class FloatTag extends Tag {
 	}
 
 	@Override
-	public Float getValue() {
-		return value;
-	}
+	public Float getValue() { return value; }
+
+	/**
+	 * Returns the value without autoboxing.
+	 */
+	public float floatValue() { return value; }
 
 	@Override
 	public boolean equals(Object obj) {

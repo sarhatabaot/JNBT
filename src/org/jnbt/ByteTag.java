@@ -53,9 +53,12 @@ public final class ByteTag extends Tag {
 	}
 
 	@Override
-	public Byte getValue() {
-		return value;
-	}
+	public Byte getValue() { return value; }
+
+	/**
+	 * Returns the value without autoboxing.
+	 */
+	public byte byteValue() { return value; }
 
 	@Override
 	public boolean equals(Object obj) {

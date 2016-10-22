@@ -53,9 +53,12 @@ public final class LongTag extends Tag {
 	}
 
 	@Override
-	public Long getValue() {
-		return value;
-	}
+	public Long getValue() { return value; }
+
+	/**
+	 * Returns the value without autoboxing.
+	 */
+	public long longValue() { return value; }
 
 	@Override
 	public boolean equals(Object obj) {

@@ -53,9 +53,12 @@ public final class DoubleTag extends Tag {
 	}
 
 	@Override
-	public Double getValue() {
-		return value;
-	}
+	public Double getValue() { return value; }
+
+	/**
+	 * Returns the value without autoboxing.
+	 */
+	public double doubleValue() { return value; }
 
 	@Override
 	public boolean equals(Object obj) {

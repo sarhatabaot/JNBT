@@ -53,9 +53,12 @@ public final class ShortTag extends Tag {
 	}
 
 	@Override
-	public Short getValue() {
-		return value;
-	}
+	public Short getValue() { return value; }
+
+	/**
+	 * Returns the value without autoboxing.
+	 */
+	public short shortValue() { return value; }
 
 	@Override
 	public boolean equals(Object obj) {
