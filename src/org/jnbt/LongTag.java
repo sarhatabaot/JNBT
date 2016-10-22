@@ -37,6 +37,8 @@ package org.jnbt;
 
 //@formatter:on
 
+import java.util.Objects;
+
 /**
  * The {@code TAG_Long} tag.
  *
@@ -56,6 +58,20 @@ public final class LongTag extends Tag {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (!(obj instanceof LongTag)) return false;
+		if (!super.equals(obj)) return false;
+		LongTag longTag = (LongTag)obj;
+		return value == longTag.value;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(super.hashCode(), value);
+	}
+
+	@Override
 	public String toString() {
 		String name   = getName();
 		String append = "";
@@ -63,22 +79,5 @@ public final class LongTag extends Tag {
 			append = "(\"" + getName() + "\")";
 		}
 		return "TAG_Long" + append + ": " + value;
-	}
-
-	@Override
-	public int hashCode() {
-		int prime  = 31;
-		int result = super.hashCode();
-		result = (prime * result) + (int)(value ^ (value >>> 32));
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) { return true; }
-		if (!super.equals(obj)) { return false; }
-		if (!(obj instanceof LongTag)) { return false; }
-		LongTag other = (LongTag)obj;
-		return value == other.value;
 	}
 }

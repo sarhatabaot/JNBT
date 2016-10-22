@@ -38,6 +38,7 @@ package org.jnbt;
 //@formatter:on
 
 import java.util.Arrays;
+import java.util.Objects;
 
 /**
  * The {@code TAG_Byte_Array} tag.
@@ -58,6 +59,20 @@ public final class IntArrayTag extends Tag {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (!(obj instanceof IntArrayTag)) return false;
+		if (!super.equals(obj)) return false;
+		IntArrayTag intArrayTag = (IntArrayTag)obj;
+		return Arrays.equals(value, intArrayTag.value);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(super.hashCode(), value);
+	}
+
+	@Override
 	public String toString() {
 		StringBuilder integers = new StringBuilder(value.length * 4);
 		for (int b : value) {
@@ -69,22 +84,5 @@ public final class IntArrayTag extends Tag {
 			append = "(\"" + getName() + "\")";
 		}
 		return "TAG_Int_Array" + append + ": " + integers;
-	}
-
-	@Override
-	public int hashCode() {
-		int prime  = 31;
-		int result = super.hashCode();
-		result = (prime * result) + Arrays.hashCode(value);
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) { return true; }
-		if (!super.equals(obj)) { return false; }
-		if (!(obj instanceof IntArrayTag)) { return false; }
-		IntArrayTag other = (IntArrayTag)obj;
-		return Arrays.equals(value, other.value);
 	}
 }

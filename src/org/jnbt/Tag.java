@@ -37,6 +37,8 @@ package org.jnbt;
 
 //@formatter:on
 
+import java.util.Objects;
+
 /**
  * Represents a single NBT tag.
  *
@@ -56,22 +58,15 @@ public abstract class Tag {
 	public abstract Object getValue();
 
 	@Override
-	public int hashCode() {
-		int prime  = 31;
-		int result = 1;
-		result = (prime * result) + ((name == null) ? 0 : name.hashCode());
-		return result;
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (!(o instanceof Tag)) return false;
+		Tag tag = (Tag)o;
+		return Objects.equals(name, tag.name);
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) { return true; }
-		if (obj == null) { return false; }
-		if (!(obj instanceof Tag)) { return false; }
-		Tag other = (Tag)obj;
-		if (name == null) {
-			if (other.name != null) { return false; }
-		} else if (!name.equals(other.name)) { return false; }
-		return true;
+	public int hashCode() {
+		return Objects.hash(name);
 	}
 }

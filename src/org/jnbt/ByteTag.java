@@ -37,6 +37,8 @@ package org.jnbt;
 
 //@formatter:on
 
+import java.util.Objects;
+
 /**
  * The {@code TAG_Byte} tag.
  *
@@ -56,6 +58,20 @@ public final class ByteTag extends Tag {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (!(obj instanceof ByteTag)) return false;
+		if (!super.equals(obj)) return false;
+		ByteTag byteTag = (ByteTag)obj;
+		return value == byteTag.value;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(super.hashCode(), value);
+	}
+
+	@Override
 	public String toString() {
 		String name   = getName();
 		String append = "";
@@ -63,22 +79,5 @@ public final class ByteTag extends Tag {
 			append = "(\"" + getName() + "\")";
 		}
 		return "TAG_Byte" + append + ": " + value;
-	}
-
-	@Override
-	public int hashCode() {
-		int prime  = 31;
-		int result = super.hashCode();
-		result = (prime * result) + value;
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) { return true; }
-		if (!super.equals(obj)) { return false; }
-		if (!(obj instanceof ByteTag)) { return false; }
-		ByteTag other = (ByteTag)obj;
-		return value == other.value;
 	}
 }

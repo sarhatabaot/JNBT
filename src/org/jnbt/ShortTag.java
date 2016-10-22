@@ -37,6 +37,8 @@ package org.jnbt;
 
 //@formatter:on
 
+import java.util.Objects;
+
 /**
  * The {@code TAG_Short} tag.
  *
@@ -56,6 +58,20 @@ public final class ShortTag extends Tag {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (!(obj instanceof ShortTag)) return false;
+		if (!super.equals(obj)) return false;
+		ShortTag shortTag = (ShortTag)obj;
+		return value == shortTag.value;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(super.hashCode(), value);
+	}
+
+	@Override
 	public String toString() {
 		String name   = getName();
 		String append = "";
@@ -63,22 +79,5 @@ public final class ShortTag extends Tag {
 			append = "(\"" + getName() + "\")";
 		}
 		return "TAG_Short" + append + ": " + value;
-	}
-
-	@Override
-	public int hashCode() {
-		int prime  = 31;
-		int result = super.hashCode();
-		result = (prime * result) + value;
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) { return true; }
-		if (!super.equals(obj)) { return false; }
-		if (!(obj instanceof ShortTag)) { return false; }
-		ShortTag other = (ShortTag)obj;
-		return value == other.value;
 	}
 }

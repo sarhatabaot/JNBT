@@ -39,6 +39,7 @@ package org.jnbt;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
@@ -62,6 +63,20 @@ public final class CompoundTag extends Tag {
 	}
 
 	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (!(obj instanceof CompoundTag)) return false;
+		if (!super.equals(obj)) return false;
+		CompoundTag compoundTag = (CompoundTag)obj;
+		return Objects.equals(value, compoundTag.value);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(super.hashCode(), value);
+	}
+
+	@Override
 	public String toString() {
 		String name   = getName();
 		String append = "";
@@ -81,25 +96,5 @@ public final class CompoundTag extends Tag {
 		}
 		bldr.append('}');
 		return bldr.toString();
-	}
-
-	@Override
-	public int hashCode() {
-		int prime  = 31;
-		int result = super.hashCode();
-		result = (prime * result) + ((value == null) ? 0 : value.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) { return true; }
-		if (!super.equals(obj)) { return false; }
-		if (!(obj instanceof CompoundTag)) { return false; }
-		CompoundTag other = (CompoundTag)obj;
-		if (value == null) {
-			if (other.value != null) { return false; }
-		} else if (!value.equals(other.value)) { return false; }
-		return true;
 	}
 }
