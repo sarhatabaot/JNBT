@@ -43,27 +43,22 @@ import java.util.Arrays;
  * The {@code TAG_Byte_Array} tag.
  *
  * @author Graham Edgecombe
- *
  */
 public final class ByteArrayTag extends Tag {
-
 	private final byte[] value;
 
 	public ByteArrayTag(String name, byte[] value) {
-
 		super(name);
 		this.value = value;
 	}
 
 	@Override
 	public byte[] getValue() {
-
 		return value;
 	}
 
 	@Override
 	public String toString() {
-
 		StringBuilder hex = new StringBuilder(value.length * 3);
 		for (byte b : value) {
 			String hexDigits = Integer.toHexString(b).toUpperCase();
@@ -72,7 +67,7 @@ public final class ByteArrayTag extends Tag {
 			}
 			hex.append(hexDigits).append(' ');
 		}
-		String name = getName();
+		String name   = getName();
 		String append = "";
 		if ((name != null) && !name.isEmpty()) {
 			append = "(\"" + getName() + "\")";
@@ -82,8 +77,7 @@ public final class ByteArrayTag extends Tag {
 
 	@Override
 	public int hashCode() {
-
-		int prime = 31;
+		int prime  = 31;
 		int result = super.hashCode();
 		result = (prime * result) + Arrays.hashCode(value);
 		return result;
@@ -91,13 +85,10 @@ public final class ByteArrayTag extends Tag {
 
 	@Override
 	public boolean equals(Object obj) {
-
 		if (this == obj) { return true; }
 		if (!super.equals(obj)) { return false; }
 		if (!(obj instanceof ByteArrayTag)) { return false; }
-		ByteArrayTag other = (ByteArrayTag) obj;
-		if (!Arrays.equals(value, other.value)) { return false; }
-		return true;
+		ByteArrayTag other = (ByteArrayTag)obj;
+		return Arrays.equals(value, other.value);
 	}
-
 }

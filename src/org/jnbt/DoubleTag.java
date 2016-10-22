@@ -41,28 +41,23 @@ package org.jnbt;
  * The {@code TAG_Double} tag.
  *
  * @author Graham Edgecombe
- *
  */
 public final class DoubleTag extends Tag {
-
 	private final double value;
 
 	public DoubleTag(String name, double value) {
-
 		super(name);
 		this.value = value;
 	}
 
 	@Override
 	public Double getValue() {
-
 		return value;
 	}
 
 	@Override
 	public String toString() {
-
-		String name = getName();
+		String name   = getName();
 		String append = "";
 		if ((name != null) && !name.isEmpty()) {
 			append = "(\"" + getName() + "\")";
@@ -72,25 +67,20 @@ public final class DoubleTag extends Tag {
 
 	@Override
 	public int hashCode() {
-
-		int prime = 31;
-		int result = super.hashCode();
+		int  prime  = 31;
+		int  result = super.hashCode();
 		long temp;
 		temp = Double.doubleToLongBits(value);
-		result = (prime * result) + (int) (temp ^ (temp >>> 32));
+		result = (prime * result) + (int)(temp ^ (temp >>> 32));
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-
 		if (this == obj) { return true; }
 		if (!super.equals(obj)) { return false; }
 		if (!(obj instanceof DoubleTag)) { return false; }
-		DoubleTag other = (DoubleTag) obj;
-		if (Double.doubleToLongBits(value) != Double
-				.doubleToLongBits(other.value)) { return false; }
-		return true;
+		DoubleTag other = (DoubleTag)obj;
+		return Double.doubleToLongBits(value) == Double.doubleToLongBits(other.value);
 	}
-
 }

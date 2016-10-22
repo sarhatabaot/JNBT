@@ -41,28 +41,23 @@ package org.jnbt;
  * The {@code TAG_Long} tag.
  *
  * @author Graham Edgecombe
- *
  */
 public final class LongTag extends Tag {
-
 	private final long value;
 
 	public LongTag(String name, long value) {
-
 		super(name);
 		this.value = value;
 	}
 
 	@Override
 	public Long getValue() {
-
 		return value;
 	}
 
 	@Override
 	public String toString() {
-
-		String name = getName();
+		String name   = getName();
 		String append = "";
 		if ((name != null) && !name.isEmpty()) {
 			append = "(\"" + getName() + "\")";
@@ -72,22 +67,18 @@ public final class LongTag extends Tag {
 
 	@Override
 	public int hashCode() {
-
-		int prime = 31;
+		int prime  = 31;
 		int result = super.hashCode();
-		result = (prime * result) + (int) (value ^ (value >>> 32));
+		result = (prime * result) + (int)(value ^ (value >>> 32));
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-
 		if (this == obj) { return true; }
 		if (!super.equals(obj)) { return false; }
 		if (!(obj instanceof LongTag)) { return false; }
-		LongTag other = (LongTag) obj;
-		if (value != other.value) { return false; }
-		return true;
+		LongTag other = (LongTag)obj;
+		return value == other.value;
 	}
-
 }

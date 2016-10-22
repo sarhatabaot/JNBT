@@ -41,28 +41,23 @@ package org.jnbt;
  * The {@code TAG_String} tag.
  *
  * @author Graham Edgecombe
- *
  */
 public final class StringTag extends Tag {
-
 	private final String value;
 
 	public StringTag(String name, String value) {
-
 		super(name);
 		this.value = value;
 	}
 
 	@Override
 	public String getValue() {
-
 		return value;
 	}
 
 	@Override
 	public String toString() {
-
-		String name = getName();
+		String name   = getName();
 		String append = "";
 		if ((name != null) && !name.isEmpty()) {
 			append = "(\"" + getName() + "\")";
@@ -72,8 +67,7 @@ public final class StringTag extends Tag {
 
 	@Override
 	public int hashCode() {
-
-		int prime = 31;
+		int prime  = 31;
 		int result = super.hashCode();
 		result = (prime * result) + ((value == null) ? 0 : value.hashCode());
 		return result;
@@ -81,15 +75,13 @@ public final class StringTag extends Tag {
 
 	@Override
 	public boolean equals(Object obj) {
-
 		if (this == obj) { return true; }
 		if (!super.equals(obj)) { return false; }
 		if (!(obj instanceof StringTag)) { return false; }
-		StringTag other = (StringTag) obj;
+		StringTag other = (StringTag)obj;
 		if (value == null) {
 			if (other.value != null) { return false; }
 		} else if (!value.equals(other.value)) { return false; }
 		return true;
 	}
-
 }

@@ -45,7 +45,6 @@ import java.util.regex.Pattern;
  * The {@code TAG_List} tag.
  *
  * @author Graham Edgecombe
- *
  */
 public final class ListTag extends Tag {
 	private static final Pattern NEWLINE_PATTERN = Pattern.compile("\n");
@@ -57,7 +56,6 @@ public final class ListTag extends Tag {
 	private final List<Tag> value;
 
 	public ListTag(String name, Class<? extends Tag> type, List<Tag> value) {
-
 		super(name);
 		this.type = type;
 		this.value = Collections.unmodifiableList(value);
@@ -67,20 +65,17 @@ public final class ListTag extends Tag {
 	 * Returns the type of items in this list.
 	 */
 	public Class<? extends Tag> getType() {
-
 		return type;
 	}
 
 	@Override
 	public List<Tag> getValue() {
-
 		return value;
 	}
 
 	@Override
 	public String toString() {
-
-		String name = getName();
+		String name   = getName();
 		String append = "";
 		if ((name != null) && !name.isEmpty()) {
 			append = "(\"" + getName() + "\")";
@@ -104,8 +99,7 @@ public final class ListTag extends Tag {
 
 	@Override
 	public int hashCode() {
-
-		int prime = 31;
+		int prime  = 31;
 		int result = super.hashCode();
 		result = (prime * result) + ((value == null) ? 0 : value.hashCode());
 		return result;
@@ -113,15 +107,13 @@ public final class ListTag extends Tag {
 
 	@Override
 	public boolean equals(Object obj) {
-
 		if (this == obj) { return true; }
 		if (!super.equals(obj)) { return false; }
 		if (!(obj instanceof ListTag)) { return false; }
-		ListTag other = (ListTag) obj;
+		ListTag other = (ListTag)obj;
 		if (value == null) {
 			if (other.value != null) { return false; }
 		} else if (!value.equals(other.value)) { return false; }
 		return true;
 	}
-
 }

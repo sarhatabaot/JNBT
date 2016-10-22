@@ -45,7 +45,6 @@ import java.util.regex.Pattern;
  * The {@code TAG_Compound} tag.
  *
  * @author Graham Edgecombe
- *
  */
 public final class CompoundTag extends Tag {
 	private static final Pattern NEWLINE_PATTERN = Pattern.compile("\n");
@@ -53,21 +52,18 @@ public final class CompoundTag extends Tag {
 	private final Map<String, Tag> value;
 
 	public CompoundTag(String name, Map<String, Tag> value) {
-
 		super(name);
 		this.value = Collections.unmodifiableMap(value);
 	}
 
 	@Override
 	public Map<String, Tag> getValue() {
-
 		return value;
 	}
 
 	@Override
 	public String toString() {
-
-		String name = getName();
+		String name   = getName();
 		String append = "";
 		if ((name != null) && !name.isEmpty()) {
 			append = "(\"" + getName() + "\")";
@@ -89,8 +85,7 @@ public final class CompoundTag extends Tag {
 
 	@Override
 	public int hashCode() {
-
-		int prime = 31;
+		int prime  = 31;
 		int result = super.hashCode();
 		result = (prime * result) + ((value == null) ? 0 : value.hashCode());
 		return result;
@@ -98,15 +93,13 @@ public final class CompoundTag extends Tag {
 
 	@Override
 	public boolean equals(Object obj) {
-
 		if (this == obj) { return true; }
 		if (!super.equals(obj)) { return false; }
 		if (!(obj instanceof CompoundTag)) { return false; }
-		CompoundTag other = (CompoundTag) obj;
+		CompoundTag other = (CompoundTag)obj;
 		if (value == null) {
 			if (other.value != null) { return false; }
 		} else if (!value.equals(other.value)) { return false; }
 		return true;
 	}
-
 }

@@ -41,28 +41,23 @@ package org.jnbt;
  * The {@code TAG_Float} tag.
  *
  * @author Graham Edgecombe
- *
  */
 public final class FloatTag extends Tag {
-
 	private final float value;
 
 	public FloatTag(String name, float value) {
-
 		super(name);
 		this.value = value;
 	}
 
 	@Override
 	public Float getValue() {
-
 		return value;
 	}
 
 	@Override
 	public String toString() {
-
-		String name = getName();
+		String name   = getName();
 		String append = "";
 		if ((name != null) && !name.isEmpty()) {
 			append = "(\"" + getName() + "\")";
@@ -72,8 +67,7 @@ public final class FloatTag extends Tag {
 
 	@Override
 	public int hashCode() {
-
-		int prime = 31;
+		int prime  = 31;
 		int result = super.hashCode();
 		result = (prime * result) + Float.floatToIntBits(value);
 		return result;
@@ -81,13 +75,10 @@ public final class FloatTag extends Tag {
 
 	@Override
 	public boolean equals(Object obj) {
-
 		if (this == obj) { return true; }
 		if (!super.equals(obj)) { return false; }
 		if (!(obj instanceof FloatTag)) { return false; }
-		FloatTag other = (FloatTag) obj;
-		if (Float.floatToIntBits(value) != Float.floatToIntBits(other.value)) { return false; }
-		return true;
+		FloatTag other = (FloatTag)obj;
+		return Float.floatToIntBits(value) == Float.floatToIntBits(other.value);
 	}
-
 }

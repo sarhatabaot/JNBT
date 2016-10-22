@@ -41,28 +41,23 @@ package org.jnbt;
  * The {@code TAG_Int} tag.
  *
  * @author Graham Edgecombe
- *
  */
 public final class IntTag extends Tag {
-
 	private final int value;
 
 	public IntTag(String name, int value) {
-
 		super(name);
 		this.value = value;
 	}
 
 	@Override
 	public Integer getValue() {
-
 		return value;
 	}
 
 	@Override
 	public String toString() {
-
-		String name = getName();
+		String name   = getName();
 		String append = "";
 		if ((name != null) && !name.isEmpty()) {
 			append = "(\"" + getName() + "\")";
@@ -72,8 +67,7 @@ public final class IntTag extends Tag {
 
 	@Override
 	public int hashCode() {
-
-		int prime = 31;
+		int prime  = 31;
 		int result = super.hashCode();
 		result = (prime * result) + value;
 		return result;
@@ -81,13 +75,10 @@ public final class IntTag extends Tag {
 
 	@Override
 	public boolean equals(Object obj) {
-
 		if (this == obj) { return true; }
 		if (!super.equals(obj)) { return false; }
 		if (!(obj instanceof IntTag)) { return false; }
-		IntTag other = (IntTag) obj;
-		if (value != other.value) { return false; }
-		return true;
+		IntTag other = (IntTag)obj;
+		return value == other.value;
 	}
-
 }
