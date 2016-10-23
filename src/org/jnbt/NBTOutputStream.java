@@ -116,62 +116,61 @@ public final class NBTOutputStream implements Closeable {
 	}
 
 	public void writeTag(Tag tag) throws IOException {
-		int    type      = NBTUtils.getTypeCode(tag.getClass());
-		String name      = tag.getName();
-		byte[] nameBytes = name.getBytes(CHARSET);
+		NBTTagType type      = NBTTagType.fromTagClass(tag.getClass());
+		byte[]     nameBytes = tag.getName().getBytes(CHARSET);
 
-		os.writeByte(type);
+		if (type == NBTTagType.TAG_END)
+			throw new IOException("[JNBT] Named TAG_End not permitted.");
+
+		os.writeByte(type.getTypeByte());
 		os.writeShort(nameBytes.length);
 		os.write(nameBytes);
-
-		if (type == NBTConstants.TYPE_END) {
-			throw new IOException("[JNBT] Named TAG_End not permitted.");
-		}
 
 		writeTagPayload(tag);
 	}
 
+	@SuppressWarnings("OverlyCoupledMethod")
 	private void writeTagPayload(Tag tag) throws IOException {
-		int type = NBTUtils.getTypeCode(tag.getClass());
+		NBTTagType type = NBTTagType.fromTagClass(tag.getClass());
 		switch (type) {
-			case NBTConstants.TYPE_END:
+			case TAG_END:
 				writeEndTagPayload((EndTag)tag);
 				break;
-			case NBTConstants.TYPE_BYTE:
+			case TAG_BYTE:
 				writeByteTagPayload((ByteTag)tag);
 				break;
-			case NBTConstants.TYPE_SHORT:
+			case TAG_SHORT:
 				writeShortTagPayload((ShortTag)tag);
 				break;
-			case NBTConstants.TYPE_INT:
+			case TAG_INT:
 				writeIntTagPayload((IntTag)tag);
 				break;
-			case NBTConstants.TYPE_LONG:
+			case TAG_LONG:
 				writeLongTagPayload((LongTag)tag);
 				break;
-			case NBTConstants.TYPE_FLOAT:
+			case TAG_FLOAT:
 				writeFloatTagPayload((FloatTag)tag);
 				break;
-			case NBTConstants.TYPE_DOUBLE:
+			case TAG_DOUBLE:
 				writeDoubleTagPayload((DoubleTag)tag);
 				break;
-			case NBTConstants.TYPE_BYTE_ARRAY:
+			case TAG_BYTE_ARRAY:
 				writeByteArrayTagPayload((ByteArrayTag)tag);
 				break;
-			case NBTConstants.TYPE_STRING:
+			case TAG_STRING:
 				writeStringTagPayload((StringTag)tag);
 				break;
-			case NBTConstants.TYPE_LIST:
+			case TAG_LIST:
 				writeListTagPayload((ListTag)tag);
 				break;
-			case NBTConstants.TYPE_COMPOUND:
+			case TAG_COMPOUND:
 				writeCompoundTagPayload((CompoundTag)tag);
 				break;
-			case NBTConstants.TYPE_INT_ARRAY:
+			case TAG_INT_ARRAY:
 				writeIntArrayTagPayload((IntArrayTag)tag);
 				break;
 			default:
-				throw new IOException("[JNBT] Invalid tag type: " + type + '.');
+				throw new AssertionError("[JNBT] Unimplemented " + NBTTagType.class.getSimpleName() + ": " + type);
 		}
 	}
 
@@ -194,12 +193,12 @@ public final class NBTOutputStream implements Closeable {
 	}
 
 	private void writeListTagPayload(ListTag tag) throws IOException {
-		Class<? extends Tag> clazz = tag.getType();
-		List<Tag>            tags  = tag.getValue();
-		int                  size  = tags.size();
+		NBTTagType tagType = tag.getType();
+		List<Tag>  tags    = tag.getValue();
+		int        length  = tags.size();
 
-		os.writeByte(NBTUtils.getTypeCode(clazz));
-		os.writeInt(size);
+		os.writeByte(tagType.getTypeByte());
+		os.writeInt(length);
 		for (Tag t : tags)
 			writeTagPayload(t);
 	}

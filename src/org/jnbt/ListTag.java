@@ -54,10 +54,10 @@ public final class ListTag extends Tag {
 	/**
 	 * The type of items in this list.
 	 */
-	private final Class<? extends Tag> type;
-	private final List<Tag> value;
+	private final NBTTagType type;
+	private final List<Tag>  value;
 
-	public ListTag(String name, Class<? extends Tag> type, List<Tag> value) {
+	public ListTag(String name, NBTTagType type, List<Tag> value) {
 		super(name);
 		this.type = type;
 		this.value = value;
@@ -66,7 +66,7 @@ public final class ListTag extends Tag {
 	/**
 	 * Returns the type of items in this list.
 	 */
-	public Class<? extends Tag> getType() {
+	public NBTTagType getType() {
 		return type;
 	}
 
@@ -96,6 +96,6 @@ public final class ListTag extends Tag {
 		                         .map(Tag::toString)
 		                         .map(s -> NEWLINE_PATTERN.matcher(s).replaceAll("\n   "))
 		                         .collect(Collectors.joining("\n", "{\n", "\n}"));
-		return getTagPrefixedToString(NBTUtils.getTypeName(type), joinedTags);
+		return getTagPrefixedToString(type.getMojangName(), joinedTags);
 	}
 }

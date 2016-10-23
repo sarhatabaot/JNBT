@@ -260,8 +260,8 @@ public final class NBTInputStream implements Closeable {
 				throw new IOException("[JNBT] TAG_End not permitted in a list.");
 			tagList.add(tag);
 		}
-		Class<? extends Tag> typeClass = NBTUtils.getTypeClass(typeByte);
-		return new ListTag(name, typeClass, tagList);
+		NBTTagType tagType = NBTTagType.fromTypeByte(typeByte);
+		return new ListTag(name, tagType, tagList);
 	}
 
 	private Tag readCompoundTagPayload(String name, int depth) throws IOException {
