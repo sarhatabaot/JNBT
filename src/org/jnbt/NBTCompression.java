@@ -41,7 +41,7 @@ package org.jnbt;
  * @author Mark Jeronimus
  */
 public enum NBTCompression {
-	UNCOMPRESED(0),
+	UNCOMPRESSED(0),
 	GZIP(1),
 	ZLIB(2),
 	FROM_BYTE(-1);
