@@ -110,7 +110,8 @@ public final class NBTOutputStream implements Closeable {
 			case FROM_BYTE:
 				throw new IllegalArgumentException(FROM_BYTE.name() + " is only for reading.");
 			default:
-				throw new IllegalArgumentException("Unsupported compression type: " + compression);
+				throw new AssertionError("[JNBT] Unimplemented " + NBTCompression.class.getSimpleName()
+				                         + ": " + compression);
 		}
 	}
 

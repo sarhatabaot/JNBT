@@ -134,9 +134,10 @@ public final class NBTInputStream implements Closeable {
 				this.is = new DataInputStream(new InflaterInputStream(is));
 				break;
 			case FROM_BYTE:
-				throw new AssertionError();
+				throw new AssertionError("FROM_BYTE Should have been handled already");
 			default:
-				throw new IllegalArgumentException("Unsupported compression type: " + compression);
+				throw new AssertionError("[JNBT] Unimplemented " + NBTCompression.class.getSimpleName()
+				                         + ": " + compression);
 		}
 	}
 

@@ -60,6 +60,7 @@ public enum NBTCompression {
 		for (NBTCompression value : values())
 			if (value.compressionId == id)
 				return value;
-		throw new IllegalArgumentException("No known compression for id: " + id);
+		throw new IllegalArgumentException("[JNBT] No " + NBTCompression.class.getSimpleName()
+		                                   + " enum constant with id: " + id);
 	}
 }
