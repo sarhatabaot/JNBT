@@ -82,7 +82,8 @@ public final class NBTOutputStream implements Closeable {
 	 * @param gzipped Whether the output stream should be GZip-compressed.
 	 * @deprecated Use {@link #NBTOutputStream(OutputStream, NBTCompression)} instead;
 	 */
-	@SuppressWarnings("MissingDeprecatedAnnotation")
+	@Deprecated
+	@SuppressWarnings("BooleanParameter")
 	public NBTOutputStream(OutputStream os, boolean gzipped) throws IOException {
 		this(os, gzipped ? GZIP : UNCOMPRESSED);
 	}
@@ -192,6 +193,7 @@ public final class NBTOutputStream implements Closeable {
 	/**
 	 * Writes a {@code TAG_Compound} tag.
 	 */
+	@SuppressWarnings("TypeMayBeWeakened") // Suppress IntelliJ bug
 	private void writeCompoundTagPayload(CompoundTag tag) throws IOException {
 		for (Tag childTag : tag.getValue().values())
 			writeTag(childTag);
@@ -216,6 +218,7 @@ public final class NBTOutputStream implements Closeable {
 	/**
 	 * Writes a {@code TAG_String} tag.
 	 */
+	@SuppressWarnings("TypeMayBeWeakened") // Suppress IntelliJ bug
 	private void writeStringTagPayload(StringTag tag) throws IOException {
 		byte[] bytes = tag.getValue().getBytes(CHARSET);
 		os.writeShort(bytes.length);

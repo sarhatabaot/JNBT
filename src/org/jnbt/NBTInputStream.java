@@ -63,7 +63,7 @@ import static org.jnbt.NBTConstants.CHARSET;
  * @author Graham Edgecombe, ensirius
  */
 public final class NBTInputStream implements Closeable {
-
+	@SuppressWarnings("TypeMayBeWeakened") // Suppress IntelliJ bug
 	private final DataInputStream is;
 
 	/**
@@ -84,8 +84,8 @@ public final class NBTInputStream implements Closeable {
 	 * @param gzipped Whether the stream is GZip-compressed.
 	 * @deprecated Use {@link #NBTInputStream(InputStream, NBTCompression)} instead;
 	 */
-	@SuppressWarnings("BooleanParameter")
 	@Deprecated
+	@SuppressWarnings("BooleanParameter")
 	public NBTInputStream(InputStream is, boolean gzipped) throws IOException {
 		this(is, gzipped ? GZIP : UNCOMPRESSED);
 	}
