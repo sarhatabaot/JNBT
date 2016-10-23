@@ -57,6 +57,8 @@ public final class DoubleTag extends Tag {
 
 	/**
 	 * Returns the value without autoboxing.
+	 *
+	 * @since 1.5
 	 */
 	public double doubleValue() { return value; }
 

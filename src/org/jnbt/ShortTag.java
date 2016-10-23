@@ -57,6 +57,8 @@ public final class ShortTag extends Tag {
 
 	/**
 	 * Returns the value without autoboxing.
+	 *
+	 * @since 1.5
 	 */
 	public short shortValue() { return value; }
 

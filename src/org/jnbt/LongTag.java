@@ -57,6 +57,8 @@ public final class LongTag extends Tag {
 
 	/**
 	 * Returns the value without autoboxing.
+	 *
+	 * @since 1.5
 	 */
 	public long longValue() { return value; }
 

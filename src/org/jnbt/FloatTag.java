@@ -57,6 +57,8 @@ public final class FloatTag extends Tag {
 
 	/**
 	 * Returns the value without autoboxing.
+	 *
+	 * @since 1.5
 	 */
 	public float floatValue() { return value; }
 

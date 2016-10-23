@@ -39,6 +39,7 @@ package org.jnbt;
 
 /**
  * @author Mark Jeronimus
+ * @since 1.5
  */
 public enum NBTCompression {
 	UNCOMPRESSED(0),

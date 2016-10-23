@@ -57,6 +57,8 @@ public final class IntTag extends Tag {
 
 	/**
 	 * Returns the value without autoboxing.
+	 *
+	 * @since 1.5
 	 */
 	public int intValue() { return value; }
 

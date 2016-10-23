@@ -57,6 +57,8 @@ public final class ByteTag extends Tag {
 
 	/**
 	 * Returns the value without autoboxing.
+	 *
+	 * @since 1.5
 	 */
 	public byte byteValue() { return value; }
 

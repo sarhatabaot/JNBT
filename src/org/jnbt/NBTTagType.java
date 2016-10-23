@@ -39,6 +39,7 @@ package org.jnbt;
 
 /**
  * @author Mark Jeronimus
+ * @since 1.5
  */
 // Created 2016-10-23
 public enum NBTTagType {
