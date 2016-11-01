@@ -52,6 +52,10 @@ public final class ByteTag extends Tag {
 		this.value = value;
 	}
 
+	public ByteTag(String name, int value) {
+		this(name, (byte)value);
+	}
+
 	@Override
 	public Byte getValue() { return value; }
 
