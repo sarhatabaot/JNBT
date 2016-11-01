@@ -265,7 +265,7 @@ public final class NBTInputStream implements Closeable {
 	}
 
 	private Tag readCompoundTagPayload(String name, int depth) throws IOException {
-		Map<String, Tag> tagMap = new HashMap<>(32);
+		Map<String, Tag> tagMap = new HashMap<>(CompoundTag.DEFAULT_INITIAL_CAPACITY);
 		while (true) {
 			Tag tag = readTag(depth + 1);
 			if (tag instanceof EndTag)

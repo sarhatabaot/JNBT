@@ -37,6 +37,7 @@ package org.jnbt;
 
 //@formatter:on
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -49,6 +50,11 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings({"AssignmentToCollectionOrArrayFieldFromParameter", "ReturnOfCollectionOrArrayField"})
 public final class ListTag extends Tag {
+	/**
+	 * @since <TODO nextVersion>
+	 */
+	public static final int DEFAULT_INITIAL_CAPACITY = 4;
+
 	private static final Pattern NEWLINE_PATTERN = Pattern.compile("\n");
 
 	/**
@@ -61,6 +67,13 @@ public final class ListTag extends Tag {
 		super(name);
 		this.type = type;
 		this.value = value;
+	}
+
+	/**
+	 * @since <TODO nextVersion>
+	 */
+	public ListTag(String name, NBTTagType type) {
+		this(name, type, new ArrayList<>(DEFAULT_INITIAL_CAPACITY));
 	}
 
 	/**

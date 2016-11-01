@@ -52,6 +52,9 @@ public final class ByteTag extends Tag {
 		this.value = value;
 	}
 
+	/**
+	 * @since <TODO nextVersion>
+	 */
 	public ByteTag(String name, int value) {
 		this(name, (byte)value);
 	}

@@ -37,6 +37,7 @@ package org.jnbt;
 
 //@formatter:on
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -49,6 +50,11 @@ import java.util.stream.Collectors;
  */
 @SuppressWarnings({"AssignmentToCollectionOrArrayFieldFromParameter", "ReturnOfCollectionOrArrayField"})
 public final class CompoundTag extends Tag {
+	/**
+	 * @since <TODO nextVersion>
+	 */
+	public static final int DEFAULT_INITIAL_CAPACITY = 32;
+
 	private static final Pattern NEWLINE_PATTERN = Pattern.compile("\n");
 
 	private final Map<String, Tag> value;
@@ -56,6 +62,13 @@ public final class CompoundTag extends Tag {
 	public CompoundTag(String name, Map<String, Tag> value) {
 		super(name);
 		this.value = value;
+	}
+
+	/**
+	 * @since <TODO nextVersion>
+	 */
+	public CompoundTag(String name) {
+		this(name, new HashMap<>(DEFAULT_INITIAL_CAPACITY));
 	}
 
 	@Override

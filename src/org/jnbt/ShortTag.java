@@ -52,6 +52,9 @@ public final class ShortTag extends Tag {
 		this.value = value;
 	}
 
+	/**
+	 * @since <TODO nextVersion>
+	 */
 	public ShortTag(String name, int value) {
 		this(name, (short)value);
 	}
