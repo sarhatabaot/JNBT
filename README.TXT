@@ -1,4 +1,4 @@
-JNBT 1.4 Beta
+JNBT 1.6 Beta
 
 The original JNBT project seems to have been abandoned.
 This fork of JNBT has mainly added support for Tag_Int_Array
@@ -30,6 +30,18 @@ JNBT is a library that can read and write NBT files, written in Java by Graham E
 --------------
 
 Version History:
+1.6 (Mark Jeronimus)
+ - Getters/setters for List and Array type tags (access like a data structure)
+    > CompoundTag.getTag(String) is especially useful
+ - Constructors for List and Array type tags (without value parameter)
+ - Constructors for primitive type tags with int parameter
+
+1.5 (Mark Jeronimus)
+ - Constructors for streams with manual compression type (using Enum)
+ - Getters for primitive type tags with primitive return value
+ Under te hood:
+ - Refactored multiple scattered utility functions into a single enum NBTTagType
+
 1.4
 - (pruby) InputStream gzip/not-gziped support
 - (ensirius) Raw DataInputStream support
