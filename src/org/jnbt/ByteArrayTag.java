@@ -61,6 +61,24 @@ public final class ByteArrayTag extends Tag {
 		return value;
 	}
 
+	/**
+	 * Returns the size of the array.
+	 *
+	 * @since 1.6
+	 */
+	public int size() {
+		return value.length;
+	}
+
+	/**
+	 * Returns the byte at index.
+	 *
+	 * @since 1.6
+	 */
+	public byte get(int index) {
+		return value[index];
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) return true;

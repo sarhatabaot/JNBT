@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings({"AssignmentToCollectionOrArrayFieldFromParameter", "ReturnOfCollectionOrArrayField"})
 public final class ListTag extends Tag {
 	/**
-	 * @since <TODO nextVersion>
+	 * @since 1.6
 	 */
 	public static final int DEFAULT_INITIAL_CAPACITY = 4;
 
@@ -70,7 +70,7 @@ public final class ListTag extends Tag {
 	}
 
 	/**
-	 * @since <TODO nextVersion>
+	 * @since 1.6
 	 */
 	public ListTag(String name, NBTTagType type) {
 		this(name, type, new ArrayList<>(DEFAULT_INITIAL_CAPACITY));
@@ -86,6 +86,31 @@ public final class ListTag extends Tag {
 	@Override
 	public List<Tag> getValue() {
 		return value;
+	}
+
+	/**
+	 * Returns the size of the list.
+	 *
+	 * @since 1.6
+	 */
+	public int size() {
+		return value.size();
+	}
+
+	/**
+	 * Returns the element at index.
+	 *
+	 * @since 1.6
+	 */
+	public Tag get(int index) {
+		return value.get(index);
+	}
+
+	/**
+	 * @since 1.6
+	 */
+	public void addTag(Tag tag) {
+		value.add(tag);
 	}
 
 	@Override

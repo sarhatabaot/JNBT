@@ -37,7 +37,11 @@ package org.jnbt;
 
 //@formatter:on
 
-import java.io.*;
+import java.io.Closeable;
+import java.io.DataInputStream;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,7 +49,10 @@ import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
-import static org.jnbt.NBTCompression.*;
+import static org.jnbt.NBTCompression.FROM_BYTE;
+import static org.jnbt.NBTCompression.GZIP;
+import static org.jnbt.NBTCompression.UNCOMPRESSED;
+import static org.jnbt.NBTCompression.fromId;
 import static org.jnbt.NBTConstants.CHARSET;
 
 /**

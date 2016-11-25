@@ -53,7 +53,7 @@ public final class ShortTag extends Tag {
 	}
 
 	/**
-	 * @since <TODO nextVersion>
+	 * @since 1.6
 	 */
 	public ShortTag(String name, int value) {
 		this(name, (short)value);

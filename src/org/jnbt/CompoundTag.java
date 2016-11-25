@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
 @SuppressWarnings({"AssignmentToCollectionOrArrayFieldFromParameter", "ReturnOfCollectionOrArrayField"})
 public final class CompoundTag extends Tag {
 	/**
-	 * @since <TODO nextVersion>
+	 * @since 1.6
 	 */
 	public static final int DEFAULT_INITIAL_CAPACITY = 32;
 
@@ -65,7 +65,7 @@ public final class CompoundTag extends Tag {
 	}
 
 	/**
-	 * @since <TODO nextVersion>
+	 * @since 1.6
 	 */
 	public CompoundTag(String name) {
 		this(name, new HashMap<>(DEFAULT_INITIAL_CAPACITY));
@@ -74,6 +74,20 @@ public final class CompoundTag extends Tag {
 	@Override
 	public Map<String, Tag> getValue() {
 		return value;
+	}
+
+	/**
+	 * @since 1.6
+	 */
+	public void addTag(Tag tag) {
+		value.put(tag.getName(), tag);
+	}
+
+	/**
+	 * @since 1.6
+	 */
+	public Tag getTag(String key) {
+		return value.get(key);
 	}
 
 	@Override
