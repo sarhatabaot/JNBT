@@ -466,7 +466,14 @@ public final class NBTReader implements Closeable {
 				int compType = is.readByte() & 0xFF;
 				while (compType != NBTConstants.TYPE_END) {
 					int nameLength = is.readShort() & 0xFFFF;
-					is.skip(nameLength);
+					
+					// Instead of using is.skip, the bytes are read using readFully()
+					// which ensures that all of the required bytes are actually read.
+					// is.skip may skip fewer than requested bytes in some cases,
+					// particularly when is wraps around a network input.
+					byte[] skip = new byte[nameLength];
+					is.readFully(skip);
+					
 					skipValue(compType);
 					compType = is.readByte() & 0xFF;
 				}
@@ -481,7 +488,15 @@ public final class NBTReader implements Closeable {
 				throw new IOException("[JNBT] Invalid tag type: " + this.nextType + '.');
 		}
 		
-		if (length > 0) is.skip(length);
+		// Instead of using is.skip, the bytes are read using readFully() which ensures
+		// that all of the required bytes are actually read. is.skip may skip fewer than
+		// requested bytes in some cases, particularly when is wraps around a network input.
+		while (length > 0) {
+			int delta = Math.min(length, 32768);
+			byte[] discard = new byte[delta];
+			is.readFully(discard);
+			length -= delta;
+		}
 	}
 
 	/**
