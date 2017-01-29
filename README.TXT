@@ -1,13 +1,14 @@
 JNBT 1.6 Beta
 
 The original JNBT project seems to have been abandoned.
-This fork of JNBT has mainly added support for Tag_Int_Array
+This fork of JNBT has added support for Tag_Int_Array, and added classes that allow reading without loading an entire NBT structure to memory.
 
 Thanks to:
 Ancient (a.k.a. grahamedgecombe) - JNBT 1.0 and 1.1
 osici - for the TAG_Lists bug
 Jocopa3 - Initial Int-Array support
 Morlok8k - Maintaining the project
+MarkJeronimus - Maintaining the project
 
 --------------
 
@@ -30,6 +31,12 @@ JNBT is a library that can read and write NBT files, written in Java by Graham E
 --------------
 
 Version History:
+1.7 (Marius Lindvall)
+ ** WORK IN PROGRESS **
+ - NBT reader and writer classes which do not require loading the entire NBT structure to memory
+    > Similar interface to GSON
+    > Especially useful for huge NBT files
+
 1.6 (Mark Jeronimus)
  - Getters/setters for List and Array type tags (access like a data structure)
     > CompoundTag.getTag(String) is especially useful
