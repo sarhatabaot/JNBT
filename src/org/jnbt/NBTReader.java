@@ -46,25 +46,70 @@ import java.util.zip.InflaterInputStream;
 
 //@formatter:on
 
+/**
+ * Class that allows reading an NBT data structure from a stream step by step without
+ * keeping the entire NBT structure in memory.
+ * 
+ * @author bilde2910
+ */
 public final class NBTReader implements Closeable {
 	private final DataInputStream is;
 	
+	// The type of the next tag in the stream.
 	private int nextType = -1;
+	
+	// The name of the next tag in the stream.
 	private String nextName = null;
+	
+	// The number of items left to read in the TAG_List at the given depth (index=depth)
+	// or -1 if the object at that depth is a TAG_Compound.
 	private ArrayList<Integer> depthItems = new ArrayList<Integer>();
+	
+	// The type of element in the TAG_List at the given depth (index=depth)
+	// or -1 if the object at that depth is a TAG_Compound.
 	private ArrayList<Integer> depthType = new ArrayList<Integer>();
+	
+	// Current data structure writing depth.
 	private int depth = -1;
 	
+	/**
+	 * Creates a new {@code NBTReader}, reading data from the given input stream
+	 * using GZip compression.
+	 * 
+	 * @since 1.7
+	 * 
+	 * @param is The input stream to read the NBT structure from.
+	 * 
+	 * @deprecated Use {@link #NBTReader(InputStream, NBTCompression)} instead.
+	 */
 	@Deprecated
 	public NBTReader(InputStream is) throws IOException {
 		this(is, NBTCompression.GZIP);
 	}
 	
+	/**
+	 * Creates a new {@code NBTReader}, reading data from the given input stream.
+	 * 
+	 * @since 1.7
+	 * 
+	 * @param is The input stream to read the NBT structure from.
+	 * @param gzipped Whether the input stream is GZip-compressed.
+	 * 
+	 * @deprecated Use {@link #NBTReader(InputStream, NBTCompression)} instead.
+	 */
 	@Deprecated
 	public NBTReader(InputStream is, boolean gzipped) throws IOException {
 		this(is, gzipped ? NBTCompression.GZIP : NBTCompression.UNCOMPRESSED);
 	}
 	
+	/**
+	 * Creates a new {@code NBTReader}, reading data from the given input stream.
+	 * 
+	 * @since 1.7
+	 * 
+	 * @param is The input stream to read the NBT structure from.
+	 * @param compression The compression type of the input data.
+	 */
 	public NBTReader(InputStream is, NBTCompression compression) throws IOException {
 		NBTCompression resolvedCompression;
 		if (compression == NBTCompression.FROM_BYTE) {
@@ -95,8 +140,16 @@ public final class NBTReader implements Closeable {
 		}
 	}
 	
+	/**
+	 * Reads and returns the name of the next tag in the stream.
+	 * 
+	 * @since 1.7
+	 */
 	public String nextName() throws IOException {
+		// Type precedes name in the file, hence it must be determined first.
 		nextType();
+		
+		// Cache the name of the tag once it has been read.
 		if (this.nextName != null) {
 			return this.nextName;
 		}
@@ -112,43 +165,84 @@ public final class NBTReader implements Closeable {
 		return this.nextName;
 	}
 	
+	/**
+	 * Reads and returns the type of the next tag in the stream.
+	 * 
+	 * @since 1.7
+	 */
 	public int nextType() throws IOException {
+		// Cache the type of tag once it has been read.
 		if (this.nextType == -1) {
 			this.nextType = is.readByte() & 0xFF;
 		}
 		return this.nextType;
 	}
 	
+	/**
+	 * Reads the value of the next tag in the stream as a TAG_Byte.
+	 * 
+	 * @since 1.7
+	 */
 	public byte nextByte() throws IOException {
 		next();
 		return is.readByte();
 	}
 	
+	/**
+	 * Reads the value of the next tag in the stream as a TAG_Short.
+	 * 
+	 * @since 1.7
+	 */
 	public short nextShort() throws IOException {
 		next();
 		return is.readShort();
 	}
 	
+	/**
+	 * Reads the value of the next tag in the stream as a TAG_Int.
+	 * 
+	 * @since 1.7
+	 */
 	public int nextInt() throws IOException {
 		next();
 		return is.readInt();
 	}
 	
+	/**
+	 * Reads the value of the next tag in the stream as a TAG_Long.
+	 * 
+	 * @since 1.7
+	 */
 	public long nextLong() throws IOException {
 		next();
 		return is.readLong();
 	}
 	
+	/**
+	 * Reads the value of the next tag in the stream as a TAG_Float.
+	 * 
+	 * @since 1.7
+	 */
 	public float nextFloat() throws IOException {
 		next();
 		return is.readFloat();
 	}
 	
+	/**
+	 * Reads the value of the next tag in the stream as a TAG_Double.
+	 * 
+	 * @since 1.7
+	 */
 	public double nextDouble() throws IOException {
 		next();
 		return is.readDouble();
 	}
 	
+	/**
+	 * Reads the value of the next tag in the stream as a TAG_Byte_Array.
+	 * 
+	 * @since 1.7
+	 */
 	public byte[] nextByteArray() throws IOException {
 		next();
 		int length = is.readInt();
@@ -157,6 +251,11 @@ public final class NBTReader implements Closeable {
 		return data;
 	}
 	
+	/**
+	 * Reads the value of the next tag in the stream as a TAG_String.
+	 * 
+	 * @since 1.7
+	 */
 	public String nextString() throws IOException {
 		next();
 		int length = is.readShort();
@@ -165,6 +264,11 @@ public final class NBTReader implements Closeable {
 		return new String(bytes, NBTConstants.CHARSET);
 	}
 	
+	/**
+	 * Reads the value of the next tag in the stream as a TAG_Int_Array.
+	 * 
+	 * @since 1.7
+	 */
 	public int[] nextIntArray() throws IOException {
 		next();
 		int length = is.readInt();
@@ -173,6 +277,11 @@ public final class NBTReader implements Closeable {
 		return array;
 	}
 	
+	/**
+	 * Prepares the next tag to be read from the stream.
+	 * 
+	 * @since 1.7
+	 */
 	private void next() throws IOException {
 		this.nextName = null;
 		int itemsLeft = (this.depth < 0 ? -1 : getRemainingItems());
@@ -187,36 +296,78 @@ public final class NBTReader implements Closeable {
 		}
 	}
 	
+	/**
+	 * Returns the remaining number of items that should be read from the currently
+	 * active TAG_List parent. -1 if the parent being read from is an TAG_Compound.
+	 * 
+	 * @since 1.7
+	 */
 	private int getRemainingItems() {
 		return this.depthItems.get(this.depth);
 	}
 	
+	/**
+	 * Opens the next tag of the stream as a TAG_Compound, allowing tags within the
+	 * TAG_Compound to be read.
+	 * 
+	 * @since 1.7
+	 */
 	public void beginObject() {
+		// Reset tag name and type caches.
 		this.nextName = null;
 		this.nextType = -1;
+		// -1 to internally indicate that the tag at this depth is a TAG_Compound.
 		this.depthItems.add(-1);
 		this.depthType.add(-1);
+		// Increase the depth at which we are currently reading.
 		this.depth++;
 	}
 	
+	/**
+	 * Opens the next tag of the stream as a TAG_List, allowing tags within the
+	 * TAG_List to be read.
+	 * 
+	 * @since 1.7
+	 */
 	public void beginArray() throws IOException {
+		// Reset tag name. (Elements in a TAG_List have no names.)
 		this.nextName = null;
+		// Determine the type and number of tags this list contains.
 		int type = is.readByte();
 		int length = is.readInt();
 		this.nextType = type;
+		// Internally indicate the number of items that this list contains, to
+		// ensure that no more, and no less, than this number of children will be
+		// read from this TAG_List.
 		this.depthItems.add(length);
+		// Internally indicate the type of list that is present at this structure depth.
 		this.depthType.add(type);
+		// Increase the depth at which we are currently reading.
 		this.depth++;
 	}
 	
+	/**
+	 * Whether or not another element is available in this TAG_Compound or TAG_List.
+	 * 
+	 * @since 1.7
+	 */
 	public boolean hasNext() throws IOException {
 		if (this.depth < 0) {
+			// This method was called at root level
 			throw new IOException("[JNBT] hasNext() cannot be called outside of an object (TAG_Compound) or array (TAG_List)!");
 		}
 		int itemsLeft = getRemainingItems();
+		//     [--TAG_List--]   [---------------------TAG_Compound---------------------]
 		return itemsLeft > 0 || (itemsLeft == -1 && nextType() != NBTConstants.TYPE_END);
 	}
 	
+	/**
+	 * Finish reading the current TAG_List instance and return to reading elements
+	 * from that list's parent tag. This method will throw an exception if there are
+	 * remaining elements to read in this TAG_List.
+	 * 
+	 * @since 1.7
+	 */
 	public void endArray() throws IOException {
 		int itemsLeft = getRemainingItems();
 		if (itemsLeft == -1) {
@@ -230,6 +381,13 @@ public final class NBTReader implements Closeable {
 		next();
 	}
 	
+	/**
+	 * Finish reading the current TAG_Compound instance and return to reading elements
+	 * from that compound tag's parent tag. This method will throw an exception if there
+	 * are remaining elements to read in this TAG_Compound.
+	 * 
+	 * @since 1.7
+	 */
 	public void endObject() throws IOException {
 		int itemsLeft = getRemainingItems();
 		if (itemsLeft != -1) {
@@ -244,12 +402,24 @@ public final class NBTReader implements Closeable {
 		next();
 	}
 	
+	/**
+	 * Skips the next tag in the stream. This must only be called after the name of the
+	 * tag has been read using {@link #nextName()}.
+	 * 
+	 * @since 1.7
+	 */
 	public void skipValue() throws IOException {
 		skipValue(this.nextType);
 		next();
 	}
 	
+	/**
+	 * Skips the tag of the given type at the current position in the stream.
+	 * 
+	 * @since 1.7
+	 */
 	private void skipValue(int type) throws IOException {
+		// Number of bytes that should be skipped over in the input stream.
 		int length = 0;
 		
 		switch (type) {
@@ -314,6 +484,9 @@ public final class NBTReader implements Closeable {
 		if (length > 0) is.skip(length);
 	}
 
+	/**
+	 * Closes the underlying input stream.
+	 */
 	@Override
 	public void close() throws IOException {
 		is.close();
