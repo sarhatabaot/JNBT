@@ -281,8 +281,11 @@ public final class NBTReader implements Closeable {
 	 * Prepares the next tag to be read from the stream.
 	 * 
 	 * @since 1.7
+	 * 
+	 * @throws IllegalStateException if an attempt is made to read a tag from a
+	 * TAG_List that has no unread tags.
 	 */
-	private void next() throws IOException {
+	private void next() throws IOException, IllegalStateException {
 		this.nextName = null;
 		int itemsLeft = (this.depth < 0 ? -1 : getRemainingItems());
 		if (itemsLeft > 0) {
@@ -290,7 +293,7 @@ public final class NBTReader implements Closeable {
 			this.depthItems.set(this.depth, itemsLeft);
 			this.nextType = this.depthType.get(this.depth);
 		} else if (itemsLeft == 0) {
-			throw new IOException("[JNBT] Attempted to read next element from a list with no remaining elements!");
+			throw new IllegalStateException("[JNBT] Attempted to read next element from a list with no remaining elements!");
 		} else {
 			this.nextType = -1;
 		}
@@ -350,11 +353,13 @@ public final class NBTReader implements Closeable {
 	 * Whether or not another element is available in this TAG_Compound or TAG_List.
 	 * 
 	 * @since 1.7
+	 * 
+	 * @throws IllegalStateException if this method is called at the root level.
 	 */
-	public boolean hasNext() throws IOException {
+	public boolean hasNext() throws IOException, IllegalStateException {
 		if (this.depth < 0) {
 			// This method was called at root level
-			throw new IOException("[JNBT] hasNext() cannot be called outside of an object (TAG_Compound) or array (TAG_List)!");
+			throw new IllegalStateException("[JNBT] hasNext() cannot be called at the root level!");
 		}
 		int itemsLeft = getRemainingItems();
 		//     [--TAG_List--]   [---------------------TAG_Compound---------------------]
@@ -363,17 +368,19 @@ public final class NBTReader implements Closeable {
 	
 	/**
 	 * Finish reading the current TAG_List instance and return to reading elements
-	 * from that list's parent tag. This method will throw an exception if there are
-	 * remaining elements to read in this TAG_List.
+	 * from that list's parent tag.
 	 * 
 	 * @since 1.7
+	 * 
+	 * @throws IllegalStateException if there are remaining elements to read in
+	 * this TAG_List.
 	 */
-	public void endArray() throws IOException {
+	public void endArray() throws IOException, IllegalStateException {
 		int itemsLeft = getRemainingItems();
 		if (itemsLeft == -1) {
-			throw new IOException("[JNBT] Attempted to end an object using endArray()!");
+			throw new IllegalStateException("[JNBT] Attempted to end an object using endArray()!");
 		} else if (itemsLeft > 0) {
-			throw new IOException("[JNBT] Attempted to end an array prematurely!");
+			throw new IllegalStateException("[JNBT] Attempted to end an array prematurely!");
 		}
 		this.depth--;
 		this.depthItems.remove(this.depthItems.size() - 1);
@@ -383,18 +390,20 @@ public final class NBTReader implements Closeable {
 	
 	/**
 	 * Finish reading the current TAG_Compound instance and return to reading elements
-	 * from that compound tag's parent tag. This method will throw an exception if there
-	 * are remaining elements to read in this TAG_Compound.
+	 * from that compound tag's parent tag.
 	 * 
 	 * @since 1.7
+	 * 
+	 * @throws IllegalStateException if there are remaining elements to read in
+	 * this TAG_Compound.
 	 */
-	public void endObject() throws IOException {
+	public void endObject() throws IOException, IllegalStateException {
 		int itemsLeft = getRemainingItems();
 		if (itemsLeft != -1) {
-			throw new IOException("[JNBT] Attempted to end an array using endObject()!");
+			throw new IllegalStateException("[JNBT] Attempted to end an array using endObject()!");
 		}
 		if (this.nextType != NBTConstants.TYPE_END) {
-			throw new IOException("[JNBT] Attempted to end an object prematurely!");
+			throw new IllegalStateException("[JNBT] Attempted to end an object prematurely!");
 		}
 		this.depth--;
 		this.depthItems.remove(this.depthItems.size() - 1);

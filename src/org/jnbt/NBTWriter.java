@@ -194,8 +194,11 @@ public final class NBTWriter implements Closeable, Flushable {
 	 * 
 	 * @param tagName The name of the tag to write.
 	 * @param type The type of tag to write.
+	 * 
+	 * @throws IllegalStateException if an attempt is made to write a tag of
+	 * the wrong type to a list, or to a list that has already been filled.
 	 */
-	private void writeTagHeader(String tagName, NBTTagType type) throws IOException {
+	private void writeTagHeader(String tagName, NBTTagType type) throws IOException, IllegalStateException {
 		if (depth < 0) {
 			if (type != NBTTagType.TAG_COMPOUND && !hasFlag(FLAG_ALLOW_NON_COMPOUND_ROOT_TAG)) {
 				throw new IOException("[JNBT] Invalid root tag type: " + type.getMojangName() + ".");
@@ -203,10 +206,10 @@ public final class NBTWriter implements Closeable, Flushable {
 				throw new IOException("[JNBT] Only one root tag is permitted per file.");
 			}
 		} else if (getRemainingItems() != -1 && type != this.depthType.get(this.depth)) {
-			throw new IOException("[JNBT] Attempted to write a " + type.getMojangName()
+			throw new IllegalStateException("[JNBT] Attempted to write a " + type.getMojangName()
 								+ " tag to a " + this.depthType.get(this.depth).getMojangName() + " list!");
 		} else if (getRemainingItems() == 0) {
-			throw new IOException("[JNBT] Cannot write item to list; list size exceeded!");
+			throw new IllegalStateException("[JNBT] Cannot write item to list; list size exceeded!");
 		}
 		rootWritten = true;
 		if (depth < 0 || getRemainingItems() == -1) {
@@ -359,18 +362,20 @@ public final class NBTWriter implements Closeable, Flushable {
 	}
 	
 	/**
-	 * Closes the TAG_List that is currently being written to. This method will
-	 * throw an exception if fewer tags have been written to the list than what
-	 * was specified in {@link #beginArray(String, NBTTagType, int)}.
+	 * Closes the TAG_List that is currently being written to.
 	 * 
 	 * @since 1.7
+	 * 
+	 * @throws IllegalStateException if an attempt is made to close a TAG_Compound
+	 * using this function, or if fewer tags have been written to the list than what
+	 * was specified in {@link #beginArray(String, NBTTagType, int)}.
 	 */
-	public void endArray() throws IOException {
+	public void endArray() throws IOException, IllegalStateException {
 		int itemsLeft = getRemainingItems();
 		if (itemsLeft == -1) {
-			throw new IOException("[JNBT] Attempted to end an object using endArray()!");
+			throw new IllegalStateException("[JNBT] Attempted to end an object using endArray()!");
 		} else if (itemsLeft > 0) {
-			throw new IOException("[JNBT] Attempted to end an array prematurely!");
+			throw new IllegalStateException("[JNBT] Attempted to end an array prematurely!");
 		}
 		this.depth--;
 		this.depthItems.remove(this.depthItems.size() - 1);
@@ -382,14 +387,18 @@ public final class NBTWriter implements Closeable, Flushable {
 	 * TAG_End to the structure.
 	 * 
 	 * @since 1.7
+	 * 
+	 * @throws IllegalStateException if an attempt is made to close a TAG_List
+	 * using this function, or if an attempt is made to close a TAG_Compound
+	 * above the root element (root has no parents).
 	 */
-	public void endObject() throws IOException {
+	public void endObject() throws IOException, IllegalStateException {
 		if (this.depth < 0) {
-			throw new IOException("[JNBT] Attempted to end non-existent object above the root element!");
+			throw new IllegalStateException("[JNBT] Attempted to end non-existent object above the root element!");
 		}
 		int itemsLeft = getRemainingItems();
 		if (itemsLeft != -1) {
-			throw new IOException("[JNBT] Attempted to end an array using endObject()!");
+			throw new IllegalStateException("[JNBT] Attempted to end an array using endObject()!");
 		}
 		os.writeByte(NBTTagType.TAG_END.getTypeByte());
 		this.depth--;
