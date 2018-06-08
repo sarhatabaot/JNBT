@@ -1,7 +1,5 @@
 package org.jnbt;
 
-//@formatter:off
-
 /*
  * JNBT License
  *
@@ -35,44 +33,60 @@ package org.jnbt;
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-//@formatter:on
-
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.Objects;
 
-/**
- * The {@code TAG_Long} tag.
- *
- * @author Graham Edgecombe
- */
-public final class LongTag extends Tag {
-	private final long value;
+public final class LongTag extends NumberTag {
 
-	public LongTag(String name, long value) {
-		super(name);
-		this.value = value;
-	}
+    static final LongTag EMPTY = new LongTag(0L);
 
-	@Override
-	public Long getValue() { return value; }
+    private final long value;
 
-	/**
-	 * Returns the value without autoboxing.
-	 *
-	 * @since 1.5
-	 */
-	public long longValue() { return value; }
+    LongTag(long value) {
+        this.value = value;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (!(obj instanceof LongTag)) return false;
-		if (!super.equals(obj)) return false;
-		LongTag longTag = (LongTag)obj;
-		return value == longTag.value;
-	}
+    @Override
+    public boolean isPresent() {
+        return this != EMPTY;
+    }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(super.hashCode(), value);
-	}
+    @Override
+    public LongTag asLong() {
+        return this;
+    }
+
+    @Override
+    public Long getValue() {
+        return value;
+    }
+
+    public long longValue() {
+        return value;
+    }
+
+    @Override
+    public TagType getType() {
+        return TagType.LONG;
+    }
+
+    @Override
+    void writeValue(DataOutput out) throws IOException {
+        out.writeLong(value);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof LongTag)) return false;
+        if (!super.equals(obj)) return false;
+        LongTag longTag = (LongTag) obj;
+        return value == longTag.value;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), value);
+    }
 }

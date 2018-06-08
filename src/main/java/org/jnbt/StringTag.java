@@ -1,7 +1,5 @@
 package org.jnbt;
 
-//@formatter:off
-
 /*
  * JNBT License
  *
@@ -35,44 +33,77 @@ package org.jnbt;
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-//@formatter:on
-
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
-/**
- * The {@code TAG_String} tag.
- *
- * @author Graham Edgecombe
- */
 public final class StringTag extends Tag {
-	private final String value;
 
-	public StringTag(String name, String value) {
-		super(name);
-		this.value = value;
-	}
+    static final Charset CHARSET = StandardCharsets.UTF_8;
+    static final StringTag EMPTY = new StringTag("");
 
-	@Override
-	public String getValue() {
-		return value;
-	}
+    private final String value;
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (!(obj instanceof StringTag)) return false;
-		if (!super.equals(obj)) return false;
-		StringTag stringTag = (StringTag)obj;
-		return Objects.equals(value, stringTag.value);
-	}
+    StringTag(String value) {
+        this.value = value;
+    }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(super.hashCode(), value);
-	}
+    @Override
+    public boolean isPresent() {
+        return this != EMPTY;
+    }
 
-	@Override
-	public String toString() {
-		return getTagPrefixedToString("\"", value, "\"");
-	}
+    @Override
+    public StringTag asString() {
+        return this;
+    }
+
+    @Override
+    public String getValue() {
+        return value;
+    }
+
+    @Override
+    public TagType getType() {
+        return TagType.STRING;
+    }
+
+    @Override
+    void writeValue(DataOutput out) throws IOException {
+        byte[] bytes = value.getBytes(StringTag.CHARSET);
+        out.writeShort(bytes.length);
+        out.write(bytes);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof StringTag)) return false;
+        if (!super.equals(obj)) return false;
+        StringTag stringTag = (StringTag) obj;
+        return Objects.equals(value, stringTag.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), value);
+    }
+
+    @Override
+    public String toString() {
+        if (isPresent()) {
+            return '"' + getValueString() + '"';
+        }
+        return super.toString();
+    }
+
+    static String readString(DataInput in) throws IOException {
+        short length = in.readShort();
+        byte[] bytes = new byte[length];
+        in.readFully(bytes);
+        return new String(bytes, StringTag.CHARSET);
+    }
 }

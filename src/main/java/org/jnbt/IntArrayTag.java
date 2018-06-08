@@ -1,7 +1,5 @@
 package org.jnbt;
 
-//@formatter:off
-
 /*
  * JNBT License
  *
@@ -35,70 +33,65 @@ package org.jnbt;
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-//@formatter:on
-
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
-/**
- * The {@code TAG_Byte_Array} tag.
- *
- * @author Jocopa3
- */
-@SuppressWarnings({"AssignmentToCollectionOrArrayFieldFromParameter",
-                   "ReturnOfCollectionOrArrayField",
-                   "MethodCanBeVariableArityMethod"})
 public final class IntArrayTag extends Tag {
-	private final int[] value;
 
-	public IntArrayTag(String name, int[] value) {
-		super(name);
-		this.value = value;
-	}
+    static final IntArrayTag EMPTY = new IntArrayTag(new int[0]);
 
-	@Override
-	public int[] getValue() {
-		return value;
-	}
+    private final int[] value;
 
-	/**
-	 * Returns the size of the array.
-	 *
-	 * @since 1.6
-	 */
-	public int size() {
-		return value.length;
-	}
+    IntArrayTag(int[] value) {
+        this.value = value;
+    }
 
-	/**
-	 * Returns the int at index.
-	 *
-	 * @since 1.6
-	 */
-	public int get(int index) {
-		return value[index];
-	}
+    @Override
+    public boolean isPresent() {
+        return this != EMPTY;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (!(obj instanceof IntArrayTag)) return false;
-		if (!super.equals(obj)) return false;
-		IntArrayTag intArrayTag = (IntArrayTag)obj;
-		return Arrays.equals(value, intArrayTag.value);
-	}
+    @Override
+    public IntArrayTag asIntArray() {
+        return this;
+    }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(super.hashCode(), value);
-	}
+    @Override
+    public int[] getValue() {
+        return value;
+    }
 
-	@Override
-	public String toString() {
-		String joinedValues = Arrays.stream(value)
-		                            .mapToObj(Integer::toString)
-		                            .collect(Collectors.joining(", ", "[", "]"));
-		return getTagPrefixedToString(joinedValues);
-	}
+    @Override
+    String getValueString() {
+        return Arrays.toString(value);
+    }
+
+    @Override
+    public TagType getType() {
+        return TagType.INT_ARRAY;
+    }
+
+    @Override
+    void writeValue(DataOutput out) throws IOException {
+        out.writeInt(value.length);
+        for (int i : value) {
+            out.writeInt(i);
+        }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof IntArrayTag)) return false;
+        if (!super.equals(obj)) return false;
+        IntArrayTag intArrayTag = (IntArrayTag) obj;
+        return Arrays.equals(value, intArrayTag.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), value);
+    }
 }

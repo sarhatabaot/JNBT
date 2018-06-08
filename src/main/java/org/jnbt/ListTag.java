@@ -1,7 +1,5 @@
 package org.jnbt;
 
-//@formatter:off
-
 /*
  * JNBT License
  *
@@ -35,105 +33,116 @@ package org.jnbt;
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-//@formatter:on
-
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
-/**
- * The {@code TAG_List} tag.
- *
- * @author Graham Edgecombe
- */
-@SuppressWarnings({"AssignmentToCollectionOrArrayFieldFromParameter", "ReturnOfCollectionOrArrayField"})
-public final class ListTag extends Tag {
-	/**
-	 * @since 1.6
-	 */
-	public static final int DEFAULT_INITIAL_CAPACITY = 4;
+public final class ListTag<T extends Tag> extends Tag implements Iterable<T> {
 
-	private static final Pattern NEWLINE_PATTERN = Pattern.compile("\n");
+    private static final ListTag EMPTY = new ListTag<>(NullTag.NULL.getType(), Collections.emptyList());
 
-	/**
-	 * The type of items in this list.
-	 */
-	private final NBTTagType type;
-	private final List<Tag>  value;
+    private final TagType childType;
+    private final List<T> value;
 
-	public ListTag(String name, NBTTagType type, List<Tag> value) {
-		super(name);
-		this.type = type;
-		this.value = value;
-	}
+    ListTag(TagType childType, List<T> value) {
+        this.childType = childType;
+        this.value = value;
+    }
 
-	/**
-	 * @since 1.6
-	 */
-	public ListTag(String name, NBTTagType type) {
-		this(name, type, new ArrayList<>(DEFAULT_INITIAL_CAPACITY));
-	}
+    public ListTag<T> copy() {
+        return new ListTag<>(childType, new ArrayList<>(value));
+    }
 
-	/**
-	 * Returns the type of items in this list.
-	 */
-	public NBTTagType getType() {
-		return type;
-	}
+    public ListTag<T> immutable() {
+        return new ListTag<>(childType, Collections.unmodifiableList(value));
+    }
 
-	@Override
-	public List<Tag> getValue() {
-		return value;
-	}
+    public ListTag<T> immutableCopy() {
+        return copy().immutable();
+    }
 
-	/**
-	 * Returns the size of the list.
-	 *
-	 * @since 1.6
-	 */
-	public int size() {
-		return value.size();
-	}
+    public ListTag<T> add(T tag) {
+        if (tag.isPresent()) {
+            value.add(tag);
+        }
+        return this;
+    }
 
-	/**
-	 * Returns the element at index.
-	 *
-	 * @since 1.6
-	 */
-	public Tag get(int index) {
-		return value.get(index);
-	}
+    public ListTag<T> addAll(Iterable<T> tags) {
+        for (T t : tags) {
+            add(t);
+        }
+        return this;
+    }
 
-	/**
-	 * @since 1.6
-	 */
-	public void addTag(Tag tag) {
-		value.add(tag);
-	}
+    TagType getChildType() {
+        return childType;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (!(obj instanceof ListTag)) return false;
-		if (!super.equals(obj)) return false;
-		ListTag listTag = (ListTag)obj;
-		return Objects.equals(type, listTag.type) &&
-		       Objects.equals(value, listTag.value);
-	}
+    @Override
+    public boolean isPresent() {
+        return this != EMPTY;
+    }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(super.hashCode(), type, value);
-	}
+    @Override
+    public ListTag<?> asList() {
+        return this;
+    }
 
-	@Override
-	public String toString() {
-		String joinedTags = value.stream()
-		                         .map(Tag::toString)
-		                         .map(s -> NEWLINE_PATTERN.matcher(s).replaceAll("\n   "))
-		                         .collect(Collectors.joining("\n", "{\n", "\n}"));
-		return getTagPrefixedToString(type.getMojangName(), joinedTags);
-	}
+    @Override
+    public List<T> getValue() {
+        return value;
+    }
+
+    @Override
+    String getValueString() {
+        return value.toString();
+    }
+
+    @Override
+    public TagType getType() {
+        return TagType.LIST;
+    }
+
+    @Override
+    void writeValue(DataOutput out) throws IOException {
+        out.writeByte(childType.getId());
+        out.writeInt(value.size());
+        for (Tag tag : value) {
+            tag.writeValue(out);
+        }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ListTag)) return false;
+        if (!super.equals(obj)) return false;
+        ListTag listTag = (ListTag) obj;
+        return Objects.equals(childType, listTag.childType) && Objects.equals(value, listTag.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), childType, value);
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return value.iterator();
+    }
+
+    @Override
+    public String toString() {
+        return getValueString();
+    }
+
+    @SuppressWarnings("unchecked")
+    static <T extends Tag> ListTag<T> empty() {
+        return (ListTag<T>) EMPTY;
+    }
 }

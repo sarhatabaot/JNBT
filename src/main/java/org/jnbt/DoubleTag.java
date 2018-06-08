@@ -1,7 +1,5 @@
 package org.jnbt;
 
-//@formatter:off
-
 /*
  * JNBT License
  *
@@ -35,44 +33,60 @@ package org.jnbt;
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-//@formatter:on
-
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.Objects;
 
-/**
- * The {@code TAG_Double} tag.
- *
- * @author Graham Edgecombe
- */
-public final class DoubleTag extends Tag {
-	private final double value;
+public final class DoubleTag extends NumberTag {
 
-	public DoubleTag(String name, double value) {
-		super(name);
-		this.value = value;
-	}
+    static final DoubleTag EMPTY = new DoubleTag(0D);
 
-	@Override
-	public Double getValue() { return value; }
+    private final double value;
 
-	/**
-	 * Returns the value without autoboxing.
-	 *
-	 * @since 1.5
-	 */
-	public double doubleValue() { return value; }
+    DoubleTag(double value) {
+        this.value = value;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (!(obj instanceof DoubleTag)) return false;
-		if (!super.equals(obj)) return false;
-		DoubleTag doubleTag = (DoubleTag)obj;
-		return Double.compare(doubleTag.value, value) == 0;
-	}
+    @Override
+    public boolean isPresent() {
+        return this != EMPTY;
+    }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(super.hashCode(), value);
-	}
+    @Override
+    public DoubleTag asDouble() {
+        return this;
+    }
+
+    @Override
+    public Double getValue() {
+        return value;
+    }
+
+    @Override
+    public TagType getType() {
+        return TagType.DOUBLE;
+    }
+
+    @Override
+    void writeValue(DataOutput out) throws IOException {
+        out.writeDouble(value);
+    }
+
+    public double doubleValue() {
+        return value;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof DoubleTag)) return false;
+        if (!super.equals(obj)) return false;
+        DoubleTag doubleTag = (DoubleTag) obj;
+        return Double.compare(doubleTag.value, value) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), value);
+    }
 }
