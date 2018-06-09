@@ -37,13 +37,17 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Objects;
 
-public final class IntTag extends NumberTag {
+public final class IntTag extends NumberTag<Integer> {
 
     static final IntTag EMPTY = new IntTag(0);
 
     private final int value;
 
     IntTag(int value) {
+        this.value = value;
+    }
+
+    IntTag(int value, TagType type) {
         this.value = value;
     }
 
@@ -63,7 +67,7 @@ public final class IntTag extends NumberTag {
     }
 
     @Override
-    public TagType getType() {
+    TagType<Integer, IntTag> getType() {
         return TagType.INT;
     }
 

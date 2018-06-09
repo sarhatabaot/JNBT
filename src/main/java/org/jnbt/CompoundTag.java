@@ -34,15 +34,12 @@ package org.jnbt;
  */
 
 import com.sun.javafx.collections.UnmodifiableObservableMap;
+
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
-public final class CompoundTag extends Tag implements Iterable<Map.Entry<String, Tag>> {
+public final class CompoundTag extends Tag<CompoundTag> implements Iterable<Map.Entry<String, Tag>> {
 
     static final CompoundTag EMPTY = new CompoundTag(Collections.emptyMap());
 
@@ -73,17 +70,22 @@ public final class CompoundTag extends Tag implements Iterable<Map.Entry<String,
     }
 
     @Override
+    protected CompoundTag getValue() {
+        return this;
+    }
+
+    @Override
     public CompoundTag asCompound() {
         return this;
     }
 
     @Override
-    public Map<String, Tag> getValue() {
-        return value;
+    String getValueString() {
+        return value.toString();
     }
 
     @Override
-    public TagType getType() {
+    TagType<CompoundTag, CompoundTag> getType() {
         return TagType.COMPOUND;
     }
 
@@ -95,9 +97,13 @@ public final class CompoundTag extends Tag implements Iterable<Map.Entry<String,
         out.writeByte(TagType.END.getId());
     }
 
-    public CompoundTag put(String key, Tag tag) {
-        if (tag.isPresent()) {
-            value.put(key, tag);
+    public Map<String, Tag> getBacking() {
+        return value;
+    }
+
+    public CompoundTag putAll(Map<String, Tag> map) {
+        for (Map.Entry<String, Tag> entry : map.entrySet()) {
+            put(entry.getKey(), entry.getValue());
         }
         return this;
     }
@@ -105,6 +111,13 @@ public final class CompoundTag extends Tag implements Iterable<Map.Entry<String,
     public CompoundTag putAll(CompoundTag other) {
         for (Map.Entry<String, Tag> entry : other) {
             put(entry.getKey(), entry.getValue());
+        }
+        return this;
+    }
+
+    public CompoundTag put(String key, Tag tag) {
+        if (tag.isPresent()) {
+            value.put(key, tag);
         }
         return this;
     }
@@ -121,6 +134,11 @@ public final class CompoundTag extends Tag implements Iterable<Map.Entry<String,
 
     public CompoundTag put(String key, long[] longs) {
         put(key, Nbt.tag(longs));
+        return this;
+    }
+
+    public CompoundTag put(String key, boolean b) {
+        put(key, Nbt.tag(b));
         return this;
     }
 
@@ -171,11 +189,11 @@ public final class CompoundTag extends Tag implements Iterable<Map.Entry<String,
         return value;
     }
 
-    public ByteArrayTag getByteArray(String name) {
+    public ByteArrayTag getByteArrayTag(String name) {
         return get(name).asByteArray();
     }
 
-    public ByteTag getByte(String name) {
+    public ByteTag getByteTag(String name) {
         return get(name).asByte();
     }
 
@@ -183,36 +201,40 @@ public final class CompoundTag extends Tag implements Iterable<Map.Entry<String,
         return get(name).asCompound();
     }
 
-    public DoubleTag getDouble(String name) {
+    public DoubleTag getDoubleTag(String name) {
         return get(name).asDouble();
     }
 
-    public IntArrayTag getIntArray(String name) {
+    public FloatTag getFloatTag(String name) {
+        return get(name).asFloat();
+    }
+
+    public IntArrayTag getIntArrayTag(String name) {
         return get(name).asIntArray();
     }
 
-    public IntTag getInt(String name) {
+    public IntTag getIntTag(String name) {
         return get(name).asInt();
     }
 
-    public LongArrayTag getLongArray(String name) {
+    public LongArrayTag getLongArrayTag(String name) {
         return get(name).asLongArray();
     }
 
-    public LongTag getLong(String name) {
+    public LongTag getLongTag(String name) {
         return get(name).asLong();
     }
 
-    public ShortTag getShort(String name) {
+    public ShortTag getShortTag(String name) {
         return get(name).asShort();
     }
 
-    public StringTag getString(String name) {
+    public StringTag getStringTag(String name) {
         return get(name).asString();
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Tag> ListTag<T> getList(String name, TagType childType) {
+    public <V, T extends Tag> ListTag<V> getListTag(String name, TagType<V, T> type) {
         Tag tag = value.get(name);
         if (tag == null) {
             return ListTag.empty();
@@ -224,10 +246,58 @@ public final class CompoundTag extends Tag implements Iterable<Map.Entry<String,
             return ListTag.empty();
         }
         ListTag list = (ListTag) tag;
-        if (list.getChildType() != childType) {
+        if (list.getChildType().getId() != type.getId()) {
             return ListTag.empty();
         }
-        return (ListTag<T>) list;
+        return (ListTag<V>) list;
+    }
+
+    public byte[] getBytes(String key) {
+        return getByteArrayTag(key).getValue();
+    }
+
+    public byte getByte(String key) {
+        return getByteTag(key).byteValue();
+    }
+
+    public double getDouble(String key) {
+        return getDoubleTag(key).doubleValue();
+    }
+
+    public float getFloat(String key) {
+        return getFloatTag(key).floatValue();
+    }
+
+    public int[] getInts(String key) {
+        return getIntArrayTag(key).getValue();
+    }
+
+    public int getInt(String key) {
+        return getIntTag(key).intValue();
+    }
+
+    public long[] getLongs(String key) {
+        return getLongArrayTag(key).getValue();
+    }
+
+    public long getLong(String key) {
+        return getLongTag(key).getValue();
+    }
+
+    public short getShort(String key) {
+        return getShortTag(key).getValue();
+    }
+
+    public String getString(String key) {
+        return getStringTag(key).getValue();
+    }
+
+    public <V> V get(String key, V def, NbtDeserializer<V> deserializer) {
+        return deserializer.apply(get(key), def);
+    }
+
+    public <V> V map(V def, NbtDeserializer<V> deserializer) {
+        return deserializer.apply(this, def);
     }
 
     @Override

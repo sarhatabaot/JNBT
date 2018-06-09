@@ -38,13 +38,17 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;
 
-public final class IntArrayTag extends Tag {
+public final class IntArrayTag extends Tag<int[]> {
 
     static final IntArrayTag EMPTY = new IntArrayTag(new int[0]);
 
     private final int[] value;
 
     IntArrayTag(int[] value) {
+        this.value = value;
+    }
+
+    IntArrayTag(int[] value, TagType type) {
         this.value = value;
     }
 
@@ -69,7 +73,7 @@ public final class IntArrayTag extends Tag {
     }
 
     @Override
-    public TagType getType() {
+    TagType<int[], IntArrayTag> getType() {
         return TagType.INT_ARRAY;
     }
 

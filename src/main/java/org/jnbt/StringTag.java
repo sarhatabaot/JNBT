@@ -40,7 +40,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
-public final class StringTag extends Tag {
+public final class StringTag extends Tag<String> {
 
     static final Charset CHARSET = StandardCharsets.UTF_8;
     static final StringTag EMPTY = new StringTag("");
@@ -48,6 +48,10 @@ public final class StringTag extends Tag {
     private final String value;
 
     StringTag(String value) {
+        this.value = value;
+    }
+
+    StringTag(String value, TagType type) {
         this.value = value;
     }
 
@@ -67,7 +71,7 @@ public final class StringTag extends Tag {
     }
 
     @Override
-    public TagType getType() {
+    TagType<String, StringTag> getType() {
         return TagType.STRING;
     }
 
@@ -90,14 +94,6 @@ public final class StringTag extends Tag {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), value);
-    }
-
-    @Override
-    public String toString() {
-        if (isPresent()) {
-            return '"' + getValueString() + '"';
-        }
-        return super.toString();
     }
 
     static String readString(DataInput in) throws IOException {

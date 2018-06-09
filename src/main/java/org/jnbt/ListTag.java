@@ -35,52 +35,79 @@ package org.jnbt;
 
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
-public final class ListTag<T extends Tag> extends Tag implements Iterable<T> {
+public final class ListTag<V> extends Tag<ListTag> implements Iterable<V> {
 
-    private static final ListTag EMPTY = new ListTag<>(NullTag.NULL.getType(), Collections.emptyList());
+    private static final ListTag EMPTY = new ListTag<>(Collections.emptyList(), TagType.NULL);
 
-    private final TagType childType;
-    private final List<T> value;
+    private final TagType<V, ? extends Tag<V>> child;
+    private final List<Tag<V>> value;
 
-    ListTag(TagType childType, List<T> value) {
-        this.childType = childType;
+    ListTag(List<Tag<V>> value, TagType<V, ? extends Tag<V>> childType) {
+        this.child = childType;
         this.value = value;
     }
 
-    public ListTag<T> copy() {
-        return new ListTag<>(childType, new ArrayList<>(value));
+    public ListTag<V> copy() {
+        return new ListTag<>(new ArrayList<>(value), child);
     }
 
-    public ListTag<T> immutable() {
-        return new ListTag<>(childType, Collections.unmodifiableList(value));
+    public ListTag<V> immutable() {
+        return new ListTag<>(Collections.unmodifiableList(value), child);
     }
 
-    public ListTag<T> immutableCopy() {
-        return copy().immutable();
+    public ListTag<V> immutableCopy() {
+        return new ListTag<>(Collections.unmodifiableList(new ArrayList<>(value)), child);
     }
 
-    public ListTag<T> add(T tag) {
+    public List<Tag<V>> getBacking() {
+        return value;
+    }
+
+    public <T> List<T> getList(NbtDeserializer<T> deserializer) {
+        List<T> list = new ArrayList<>(value.size());
+        for (Tag tag : value) {
+            CompoundTag compound = tag.asCompound();
+            if (compound.isPresent()) {
+                T t = deserializer.apply(compound);
+                list.add(t);
+            }
+        }
+        return list;
+    }
+
+    public ListTag<V> add(Tag<V> tag) {
         if (tag.isPresent()) {
             value.add(tag);
         }
         return this;
     }
 
-    public ListTag<T> addAll(Iterable<T> tags) {
-        for (T t : tags) {
-            add(t);
+    public ListTag<V> add(V value) {
+        Tag<V> tag = child.create(value);
+        add(tag);
+        return this;
+    }
+
+    public ListTag<V> add(Iterable<V> values) {
+        for (V v : values) {
+            Tag<V> tag = child.create(v);
+            add(tag);
         }
         return this;
     }
 
-    TagType getChildType() {
-        return childType;
+    public ListTag<V> addAll(ListTag<V> list) {
+        addAll(list.value);
+        return this;
+    }
+
+    public ListTag<V> addAll(Iterable<Tag<V>> tags) {
+        for (Tag<V> t : tags) {
+            add(t);
+        }
+        return this;
     }
 
     @Override
@@ -94,8 +121,8 @@ public final class ListTag<T extends Tag> extends Tag implements Iterable<T> {
     }
 
     @Override
-    public List<T> getValue() {
-        return value;
+    public ListTag getValue() {
+        return this;
     }
 
     @Override
@@ -104,13 +131,17 @@ public final class ListTag<T extends Tag> extends Tag implements Iterable<T> {
     }
 
     @Override
-    public TagType getType() {
+    TagType<ListTag, ListTag> getType() {
         return TagType.LIST;
+    }
+
+    TagType<V, ?> getChildType() {
+        return child;
     }
 
     @Override
     void writeValue(DataOutput out) throws IOException {
-        out.writeByte(childType.getId());
+        out.writeByte(child.getId());
         out.writeInt(value.size());
         for (Tag tag : value) {
             tag.writeValue(out);
@@ -123,17 +154,30 @@ public final class ListTag<T extends Tag> extends Tag implements Iterable<T> {
         if (!(obj instanceof ListTag)) return false;
         if (!super.equals(obj)) return false;
         ListTag listTag = (ListTag) obj;
-        return Objects.equals(childType, listTag.childType) && Objects.equals(value, listTag.value);
+        return Objects.equals(child, listTag.child) && Objects.equals(value, listTag.value);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), childType, value);
+        return Objects.hash(super.hashCode(), child, value);
     }
 
     @Override
-    public Iterator<T> iterator() {
-        return value.iterator();
+    public Iterator<V> iterator() {
+        return new Iterator<V>() {
+
+            private final Iterator<Tag<V>> iterator = value.iterator();
+
+            @Override
+            public boolean hasNext() {
+                return iterator.hasNext();
+            }
+
+            @Override
+            public V next() {
+                return iterator.next().getValue();
+            }
+        };
     }
 
     @Override
@@ -142,7 +186,7 @@ public final class ListTag<T extends Tag> extends Tag implements Iterable<T> {
     }
 
     @SuppressWarnings("unchecked")
-    static <T extends Tag> ListTag<T> empty() {
+    static <T> ListTag<T> empty() {
         return (ListTag<T>) EMPTY;
     }
 }

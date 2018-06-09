@@ -37,13 +37,17 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Objects;
 
-public final class ByteTag extends NumberTag {
+public final class ByteTag extends NumberTag<Byte> {
 
     static final ByteTag EMPTY = new ByteTag((byte) 0);
 
     private final byte value;
 
     ByteTag(byte value) {
+        this.value = value;
+    }
+
+    ByteTag(byte value, TagType type) {
         this.value = value;
     }
 
@@ -63,7 +67,7 @@ public final class ByteTag extends NumberTag {
     }
 
     @Override
-    public TagType getType() {
+    TagType<Byte, ByteTag> getType() {
         return TagType.BYTE;
     }
 

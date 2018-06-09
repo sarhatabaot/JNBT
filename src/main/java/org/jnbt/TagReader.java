@@ -2,22 +2,18 @@ package org.jnbt;
 
 import java.io.DataInput;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 interface TagReader {
 
     Tag read(DataInput in) throws IOException;
 
     TagReader NULL = in -> NullTag.NULL;
-    TagReader END = in -> EndTag.INSTANCE;
+    TagReader END = in -> EndTag.END;
     TagReader BYTE = in -> new ByteTag(in.readByte());
     TagReader DOUBLE = in -> new DoubleTag(in.readDouble());
     TagReader FLOAT = in -> new FloatTag(in.readFloat());
-    TagReader INTEGER = in -> new IntTag(in.readInt());
+    TagReader INT = in -> new IntTag(in.readInt());
     TagReader LONG = in -> new LongTag(in.readLong());
     TagReader SHORT = in -> new ShortTag(in.readShort());
     TagReader STRING = in -> new StringTag(StringTag.readString(in));
@@ -67,22 +63,23 @@ interface TagReader {
         return new CompoundTag(map).immutable();
     };
 
+    @SuppressWarnings("unchecked")
     TagReader LIST = in -> {
         int childTypeId = in.readByte();
-        TagType childType = TagType.forId(childTypeId);
+        TagType<?, ?> childType = TagType.forId(childTypeId);
 
         int length = in.readInt();
         if (length == 0) {
-            return new ListTag<>(childType, Collections.emptyList());
+            return new ListTag(Collections.emptyList(), childType);
         }
 
-        List<Tag> list = new ArrayList<>(length);
+        List<Tag<?>> list = new ArrayList<>(length);
         for (int i = 0; i < length; i++) {
             Tag tag = childType.getReader().read(in);
             list.add(tag);
         }
 
-        return new ListTag<>(childType, list).immutable();
+        return new ListTag(list, childType).immutable();
     };
 
     static RootTag readRootTag(DataInput in) throws IOException {

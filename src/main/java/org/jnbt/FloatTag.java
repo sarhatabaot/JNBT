@@ -37,13 +37,17 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Objects;
 
-public final class FloatTag extends NumberTag {
+public final class FloatTag extends NumberTag<Float> {
 
     static final FloatTag EMPTY = new FloatTag(0F);
 
     private final float value;
 
     FloatTag(float value) {
+        this.value = value;
+    }
+
+    FloatTag(float value, TagType type) {
         this.value = value;
     }
 
@@ -63,7 +67,7 @@ public final class FloatTag extends NumberTag {
     }
 
     @Override
-    public TagType getType() {
+    TagType<Float, FloatTag> getType() {
         return TagType.FLOAT;
     }
 

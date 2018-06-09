@@ -37,13 +37,17 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Objects;
 
-public final class DoubleTag extends NumberTag {
+public final class DoubleTag extends NumberTag<Double> {
 
     static final DoubleTag EMPTY = new DoubleTag(0D);
 
     private final double value;
 
     DoubleTag(double value) {
+        this.value = value;
+    }
+
+    DoubleTag(double value, TagType type) {
         this.value = value;
     }
 
@@ -63,7 +67,7 @@ public final class DoubleTag extends NumberTag {
     }
 
     @Override
-    public TagType getType() {
+    TagType<Double, DoubleTag> getType() {
         return TagType.DOUBLE;
     }
 

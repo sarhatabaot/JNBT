@@ -37,7 +37,7 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Objects;
 
-public abstract class Tag {
+public abstract class Tag<V> {
 
     public boolean isAbsent() {
         return !isPresent();
@@ -104,11 +104,11 @@ public abstract class Tag {
         return Nbt.tag("" + getValue());
     }
 
-    public abstract TagType getType();
+    abstract TagType<V, ?> getType();
 
     public abstract boolean isPresent();
 
-    protected abstract Object getValue();
+    protected abstract V getValue();
 
     abstract void writeValue(DataOutput out) throws IOException;
 

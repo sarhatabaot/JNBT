@@ -36,9 +36,9 @@ package org.jnbt;
 import java.io.DataOutput;
 import java.io.IOException;
 
-public final class EndTag extends Tag {
+public final class EndTag extends Tag<Object> {
 
-    public static final EndTag INSTANCE = new EndTag();
+    public static final EndTag END = new EndTag();
 
     private EndTag() {}
 
@@ -49,11 +49,11 @@ public final class EndTag extends Tag {
 
     @Override
     public Object getValue() {
-        return null;
+        return "end";
     }
 
     @Override
-    public TagType getType() {
+    TagType<Object, EndTag> getType() {
         return TagType.END;
     }
 

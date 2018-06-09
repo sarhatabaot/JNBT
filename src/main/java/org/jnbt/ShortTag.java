@@ -37,13 +37,17 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Objects;
 
-public final class ShortTag extends NumberTag {
+public final class ShortTag extends NumberTag<Short> {
 
     static final ShortTag EMPTY = new ShortTag((short) 0);
 
     private final short value;
 
     ShortTag(short value) {
+        this.value = value;
+    }
+
+    ShortTag(short value, TagType type) {
         this.value = value;
     }
 
@@ -67,7 +71,7 @@ public final class ShortTag extends NumberTag {
     }
 
     @Override
-    public TagType getType() {
+    TagType<Short, ShortTag> getType() {
         return TagType.SHORT;
     }
 

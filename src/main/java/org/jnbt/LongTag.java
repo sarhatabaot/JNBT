@@ -37,13 +37,17 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Objects;
 
-public final class LongTag extends NumberTag {
+public final class LongTag extends NumberTag<Long> {
 
     static final LongTag EMPTY = new LongTag(0L);
 
     private final long value;
 
     LongTag(long value) {
+        this.value = value;
+    }
+
+    LongTag(long value, TagType type) {
         this.value = value;
     }
 
@@ -67,7 +71,7 @@ public final class LongTag extends NumberTag {
     }
 
     @Override
-    public TagType getType() {
+    TagType<Long, LongTag> getType() {
         return TagType.LONG;
     }
 

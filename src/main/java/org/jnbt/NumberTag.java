@@ -3,7 +3,7 @@ package org.jnbt;
 /**
  * @author dags <dags@dags.me>
  */
-public abstract class NumberTag extends Tag {
+public abstract class NumberTag<T extends Number> extends Tag<T> {
 
     @Override
     public ByteTag asByte() {
@@ -34,7 +34,4 @@ public abstract class NumberTag extends Tag {
     public ShortTag asShort() {
         return Nbt.tag(getValue().shortValue());
     }
-
-    @Override
-    public abstract Number getValue();
 }

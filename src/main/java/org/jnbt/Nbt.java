@@ -1,18 +1,10 @@
 package org.jnbt;
 
-import java.io.DataInput;
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 /**
  * @author dags <dags@dags.me>
@@ -31,33 +23,38 @@ public final class Nbt {
         return new CompoundTag(new LinkedHashMap<>(size));
     }
 
-    public static <T extends Tag> ListTag<T> list(TagType type) {
-        return new ListTag<>(type, new ArrayList<>(16));
+    public static <V> ListTag<V> list(TagType<V, ? extends Tag<V>> type) {
+        return new ListTag<>(new ArrayList<>(16), type);
     }
 
-    public static <T extends Tag> ListTag<T> list(List<T> list, TagType type) {
+    public static <V> ListTag<V> list(TagType<V, ? extends Tag<V>> type, Iterable<V> list) {
         if (list == null) {
             return ListTag.empty();
         }
-        return new ListTag<>(type, list);
+        List<Tag<V>> tags = new ArrayList<>();
+        for (V v : list) {
+            Tag<V> tag = type.create(v);
+            if (tag.isPresent()) {
+                tags.add(tag);
+            }
+        }
+        return new ListTag<>(tags, type);
+    }
+
+    public static <V> ListTag<V> list(TagType<V, ? extends Tag<V>> type, V value) {
+        return list(type, value);
     }
 
     @SafeVarargs
-    public static <V, T extends Tag> ListTag<T> list(Function<V, T> func, V first, V... elements) {
-        T tag = func.apply(first);
-        List<T> list;
-
-        if (elements.length == 0) {
-            list = Collections.singletonList(tag);
-        } else {
-            list = new ArrayList<>(elements.length);
-            list.add(tag);
-            for (V v : elements) {
-                list.add(func.apply(v));
+    public static <V> ListTag<V> list(TagType<V, ? extends Tag<V>> type, V... value) {
+        List<Tag<V>> tags = new ArrayList<>(value.length);
+        for (V v : value) {
+            Tag<V> tag = type.create(v);
+            if (tag.isPresent()) {
+                tags.add(tag);
             }
         }
-
-        return list(list, tag.getType());
+        return new ListTag<>(tags, type);
     }
 
     public static CompoundTag tag(Map<String, Tag> backing) {

@@ -38,13 +38,17 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;
 
-public final class ByteArrayTag extends Tag {
+public final class ByteArrayTag extends Tag<byte[]> {
 
     static final ByteArrayTag EMPTY = new ByteArrayTag(new byte[0]);
 
     private final byte[] value;
 
     ByteArrayTag(byte[] value) {
+        this.value = value;
+    }
+
+    ByteArrayTag(byte[] value, TagType type) {
         this.value = value;
     }
 
@@ -64,7 +68,7 @@ public final class ByteArrayTag extends Tag {
     }
 
     @Override
-    public TagType getType() {
+    TagType<byte[], ByteArrayTag> getType() {
         return TagType.BYTE_ARRAY;
     }
 

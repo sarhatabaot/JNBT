@@ -5,13 +5,17 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;
 
-public class LongArrayTag extends Tag {
+public class LongArrayTag extends Tag<long[]> {
 
     static final LongArrayTag EMPTY = new LongArrayTag(new long[0]);
 
     private final long[] value;
 
     LongArrayTag(long[] value) {
+        this.value = value;
+    }
+
+    LongArrayTag(long[] value, TagType type) {
         this.value = value;
     }
 
@@ -36,7 +40,7 @@ public class LongArrayTag extends Tag {
     }
 
     @Override
-    public TagType getType() {
+    TagType<long[], LongArrayTag> getType() {
         return TagType.LONG_ARRAY;
     }
 
