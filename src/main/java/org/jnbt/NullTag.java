@@ -17,7 +17,7 @@ class NullTag extends Tag<Object> {
     }
 
     @Override
-    protected Object getValue() {
+    public Object getValue() {
         return "null";
     }
 

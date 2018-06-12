@@ -1,6 +1,12 @@
 package org.jnbt;
 
-import java.io.*;
+import java.io.DataInput;
+import java.io.DataInputStream;
+import java.io.DataOutput;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -33,7 +39,7 @@ public final class Nbt {
         }
         List<Tag<V>> tags = new ArrayList<>();
         for (V v : list) {
-            Tag<V> tag = type.create(v);
+            Tag<V> tag = type.write(v);
             if (tag.isPresent()) {
                 tags.add(tag);
             }
@@ -49,7 +55,7 @@ public final class Nbt {
     public static <V> ListTag<V> list(TagType<V, ? extends Tag<V>> type, V... value) {
         List<Tag<V>> tags = new ArrayList<>(value.length);
         for (V v : value) {
-            Tag<V> tag = type.create(v);
+            Tag<V> tag = type.write(v);
             if (tag.isPresent()) {
                 tags.add(tag);
             }

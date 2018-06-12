@@ -43,7 +43,7 @@ import java.util.Objects;
 public final class StringTag extends Tag<String> {
 
     static final Charset CHARSET = StandardCharsets.UTF_8;
-    static final StringTag EMPTY = new StringTag("");
+    static final StringTag EMPTY = new StringTag("null");
 
     private final String value;
 

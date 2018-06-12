@@ -2,7 +2,11 @@ package org.jnbt;
 
 import java.io.DataInput;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 interface TagReader {
 
@@ -70,7 +74,7 @@ interface TagReader {
 
         int length = in.readInt();
         if (length == 0) {
-            return new ListTag(Collections.emptyList(), childType);
+            return ListTag.empty();
         }
 
         List<Tag<?>> list = new ArrayList<>(length);

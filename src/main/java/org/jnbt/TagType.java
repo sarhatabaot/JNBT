@@ -66,7 +66,7 @@ public final class TagType<V, T extends Tag> {
     }
 
     @SuppressWarnings("unchecked")
-    Tag<V> create(V val) {
+    Tag<V> write(V val) {
         if (val instanceof Tag) {
             Tag tag = (Tag) val;
             if (tag.getType() == this) {

@@ -62,7 +62,7 @@ public abstract class Tag<V> {
         return CompoundTag.EMPTY;
     }
 
-    public ListTag<?> asList() {
+    public <S, T extends Tag<S>> ListTag<S> asList(TagType<S, T> type) {
         return ListTag.empty();
     }
 
@@ -108,7 +108,7 @@ public abstract class Tag<V> {
 
     public abstract boolean isPresent();
 
-    protected abstract V getValue();
+    public abstract V getValue();
 
     abstract void writeValue(DataOutput out) throws IOException;
 

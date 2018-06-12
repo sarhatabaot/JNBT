@@ -35,7 +35,11 @@ package org.jnbt;
 
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
 
 public final class ListTag<V> extends Tag<ListTag> implements Iterable<V> {
 
@@ -85,14 +89,14 @@ public final class ListTag<V> extends Tag<ListTag> implements Iterable<V> {
     }
 
     public ListTag<V> add(V value) {
-        Tag<V> tag = child.create(value);
+        Tag<V> tag = child.write(value);
         add(tag);
         return this;
     }
 
     public ListTag<V> add(Iterable<V> values) {
         for (V v : values) {
-            Tag<V> tag = child.create(v);
+            Tag<V> tag = child.write(v);
             add(tag);
         }
         return this;
@@ -116,8 +120,12 @@ public final class ListTag<V> extends Tag<ListTag> implements Iterable<V> {
     }
 
     @Override
-    public ListTag<?> asList() {
-        return this;
+    @SuppressWarnings("unchecked")
+    public <S, T extends Tag<S>> ListTag<S> asList(TagType<S, T> type) {
+        if (type == this.child) {
+            return (ListTag<S>) this;
+        }
+        return empty();
     }
 
     @Override
@@ -182,6 +190,9 @@ public final class ListTag<V> extends Tag<ListTag> implements Iterable<V> {
 
     @Override
     public String toString() {
+        if (isAbsent()) {
+            return "[null]";
+        }
         return getValueString();
     }
 

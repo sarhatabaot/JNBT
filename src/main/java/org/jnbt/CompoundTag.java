@@ -34,10 +34,13 @@ package org.jnbt;
  */
 
 import com.sun.javafx.collections.UnmodifiableObservableMap;
-
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
 
 public final class CompoundTag extends Tag<CompoundTag> implements Iterable<Map.Entry<String, Tag>> {
 
@@ -70,7 +73,7 @@ public final class CompoundTag extends Tag<CompoundTag> implements Iterable<Map.
     }
 
     @Override
-    protected CompoundTag getValue() {
+    public CompoundTag getValue() {
         return this;
     }
 
@@ -316,6 +319,9 @@ public final class CompoundTag extends Tag<CompoundTag> implements Iterable<Map.
 
     @Override
     public String toString() {
+        if (isAbsent()) {
+            return "{null}";
+        }
         return getValueString();
     }
 
