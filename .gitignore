@@ -13,6 +13,7 @@ hs_err_pid*
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm
 # Ignore project files
 *.iml
+target
 
 # Ignore IDEA directory
 .idea/*
