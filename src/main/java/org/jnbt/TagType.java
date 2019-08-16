@@ -7,7 +7,7 @@ import java.util.function.BiFunction;
  */
 public final class TagType<V, T extends Tag> {
 
-    private static final TagType[] TYPES = new TagType[12];
+    private static final TagType[] TYPES = new TagType[13];
 
     public static final TagType<Object, NullTag> NULL = new TagType<>(-1, "null", Object.class, TagReader.NULL);
     public static final TagType<Object, EndTag> END = new TagType<>(0, "end", Object.class, TagReader.END);
