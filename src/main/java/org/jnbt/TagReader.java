@@ -74,7 +74,7 @@ interface TagReader {
 
         int length = in.readInt();
         if (length == 0) {
-            return ListTag.empty();
+            return new ListTag(Collections.emptyList(), childType).immutable();
         }
 
         List<Tag<?>> list = new ArrayList<>(length);
