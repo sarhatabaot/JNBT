@@ -1,4 +1,4 @@
-JNBT 1.6 Beta
+# JNBT: The Java NBT Library
 
 The original JNBT project seems to have been abandoned.
 This fork of JNBT has added support for Tag_Int_Array, and added classes that allow reading without loading an entire NBT structure to memory.
@@ -18,28 +18,48 @@ For more information about the project, see http://jnbt.sf.net/.
 
 --------------
 
-JNBT: The Java NBT Library
-
-What is NBT?
+### What is NBT?
 
 NBT, or Named Binary Tag, is a file format created by Markus Persson for use with Minecraft levels. Although originally designed for Minecraft levels, it is appropriate for the vast majority of use cases.
 
-What is JNBT?
+### What is JNBT?
 
 JNBT is a library that can read and write NBT files, written in Java by Graham Edgecombe and available open-source under the BSD license.
 
 --------------
 
 Version History:
+
+2.0.5 (sarhatabaot)
+- Updated README with version entries.
+  - Changed to markdown.
+- Added maven plugin to allow building with jitpack.
+- Updated gradle wrapper to 5.6.2.
+
+2.0.4 (dags-)
+- TagReader returns valid instance even if list is empty.
+
+2.0.3 (dags-)
+- TagTypes array changed to 13.
+
+2.0.2 (dags-)
+- Make getValue public on Tag.
+
+2.0.1 (dags-)
+- Use generics to make unwrapping values easier 
+
+2.0.0-SNAPSHOT (dags-)
+- Switched to gradle.
+- Refactored parts of the project. (Can't say for sure unless dags- writes it.)
+
 1.7 (Marius Lindvall)
- ** WORK IN PROGRESS **
  - NBT reader and writer classes which do not require loading the entire NBT structure to memory
-    > Similar interface to GSON
-    > Especially useful for huge NBT files
+    - Similar interface to GSON
+    - Especially useful for huge NBT files
 
 1.6 (Mark Jeronimus)
  - Getters/setters for List and Array type tags (access like a data structure)
-    > CompoundTag.getTag(String) is especially useful
+    - CompoundTag.getTag(String) is especially useful
  - Constructors for List and Array type tags (without value parameter)
  - Constructors for primitive type tags with int parameter
 
