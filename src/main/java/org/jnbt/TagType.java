@@ -3,7 +3,7 @@ package org.jnbt;
 import java.util.function.BiFunction;
 
 /**
- * @author dags <dags@dags.me>
+ * @author dags <a href="dags@dags.me"></a>
  */
 public final class TagType<V, T extends Tag> {
 

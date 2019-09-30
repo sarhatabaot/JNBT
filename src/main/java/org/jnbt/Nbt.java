@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author dags <dags@dags.me>
+ * @author dags <a href="dags@dags.me"></a>
  */
 public final class Nbt {
 

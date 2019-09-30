@@ -1,7 +1,7 @@
 package org.jnbt;
 
 /**
- * @author dags <dags@dags.me>
+ * @author dags <a href="dags@dags.me"></a>
  */
 public interface NbtSerializer<T> {
 
