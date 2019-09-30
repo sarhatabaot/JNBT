@@ -1,7 +1,5 @@
 package org.jnbt;
 
-//@formatter:off
-
 /*
  * JNBT License
  *
@@ -35,78 +33,67 @@ package org.jnbt;
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-//@formatter:on
-
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-/**
- * The {@code TAG_Byte_Array} tag.
- *
- * @author Graham Edgecombe
- */
-@SuppressWarnings({"AssignmentToCollectionOrArrayFieldFromParameter", "ReturnOfCollectionOrArrayField"})
-public final class ByteArrayTag extends Tag {
-	private final byte[] value;
+public final class ByteArrayTag extends Tag<byte[]> {
 
-	public ByteArrayTag(String name, byte[] value) {
-		super(name);
-		this.value = value;
-	}
+    static final ByteArrayTag EMPTY = new ByteArrayTag(new byte[0]);
 
-	@Override
-	public byte[] getValue() {
-		return value;
-	}
+    private final byte[] value;
 
-	/**
-	 * Returns the size of the array.
-	 *
-	 * @since 1.6
-	 */
-	public int size() {
-		return value.length;
-	}
+    ByteArrayTag(byte[] value) {
+        this.value = value;
+    }
 
-	/**
-	 * Returns the byte at index.
-	 *
-	 * @since 1.6
-	 */
-	public byte get(int index) {
-		return value[index];
-	}
+    ByteArrayTag(byte[] value, TagType type) {
+        this.value = value;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (!(obj instanceof ByteArrayTag)) return false;
-		if (!super.equals(obj)) return false;
-		ByteArrayTag byteArrayTag = (ByteArrayTag)obj;
-		return Arrays.equals(value, byteArrayTag.value);
-	}
+    @Override
+    public boolean isPresent() {
+        return this != EMPTY;
+    }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(super.hashCode(), value);
-	}
+    @Override
+    public ByteArrayTag asByteArray() {
+        return this;
+    }
 
-	@Override
-	public String toString() {
-		String joinedHexValues = byteArrayStream(value)
-				.mapToObj(ByteArrayTag::toHexByte)
-				.collect(Collectors.joining(", ", "[", "]"));
-		return getTagPrefixedToString(joinedHexValues);
-	}
+    @Override
+    public byte[] getValue() {
+        return value;
+    }
 
-	private static IntStream byteArrayStream(byte[] value) {
-		return IntStream.range(0, value.length).map(i -> value[i]);
-	}
+    @Override
+    TagType<byte[], ByteArrayTag> getType() {
+        return TagType.BYTE_ARRAY;
+    }
 
-	private static String toHexByte(int b) {
-		String hex = Integer.toHexString(b & 0xFF);
-		return hex.length() == 1 ? '0' + hex : hex;
-	}
+    @Override
+    String getValueString() {
+        return Arrays.toString(value);
+    }
+
+    @Override
+    void writeValue(DataOutput out) throws IOException {
+        out.writeInt(value.length);
+        out.write(value);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ByteArrayTag)) return false;
+        if (!super.equals(obj)) return false;
+        ByteArrayTag byteArrayTag = (ByteArrayTag) obj;
+        return Arrays.equals(value, byteArrayTag.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), value);
+    }
 }

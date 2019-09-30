@@ -1,7 +1,5 @@
 package org.jnbt;
 
-//@formatter:off
-
 /*
  * JNBT License
  *
@@ -35,25 +33,42 @@ package org.jnbt;
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-//@formatter:on
+import java.io.DataOutput;
+import java.io.IOException;
 
-/**
- * The {@code TAG_End} tag.
- *
- * @author Graham Edgecombe
- */
-public final class EndTag extends Tag {
-	public EndTag() {
-		super("");
-	}
+public final class EndTag extends Tag<Object> {
 
-	@Override
-	public Object getValue() {
-		return null;
-	}
+    public static final EndTag END = new EndTag();
 
-	@Override
-	public String toString() {
-		return getTagPrefixedToString();
-	}
+    private EndTag() {}
+
+    @Override
+    public boolean isPresent() {
+        return true;
+    }
+
+    @Override
+    public Object getValue() {
+        return "end";
+    }
+
+    @Override
+    TagType<Object, EndTag> getType() {
+        return TagType.END;
+    }
+
+    @Override
+    public void writeTo(String name, DataOutput out) throws IOException {
+        out.writeByte((byte) 0);
+    }
+
+    @Override
+    void writeValue(DataOutput out) throws IOException {
+
+    }
+
+    @Override
+    public String toString() {
+        return "END";
+    }
 }

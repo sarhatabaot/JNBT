@@ -1,7 +1,5 @@
 package org.jnbt;
 
-//@formatter:off
-
 /*
  * JNBT License
  *
@@ -35,53 +33,104 @@ package org.jnbt;
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-//@formatter:on
-
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.Objects;
 
-/**
- * Represents a single NBT tag.
- *
- * @author Graham Edgecombe
- */
-public abstract class Tag {
-	private final String name;
+public abstract class Tag<V> {
 
-	protected Tag(String name) {
-		this.name = name;
-	}
+    public boolean isAbsent() {
+        return !isPresent();
+    }
 
-	public String getName() {
-		return name;
-	}
+    String getValueString() {
+        if (isAbsent()) {
+            return "null";
+        }
+        return getValue().toString();
+    }
 
-	public abstract Object getValue();
+    public ByteArrayTag asByteArray() {
+        return ByteArrayTag.EMPTY;
+    }
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (!(o instanceof Tag)) return false;
-		Tag tag = (Tag)o;
-		return Objects.equals(name, tag.name);
-	}
+    public ByteTag asByte() {
+        return ByteTag.EMPTY;
+    }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(name);
-	}
+    public CompoundTag asCompound() {
+        return CompoundTag.EMPTY;
+    }
 
-	@Override
-	public String toString() {
-		return getTagPrefixedToString(getValue().toString());
-	}
+    public <S, T extends Tag<S>> ListTag<S> asList(TagType<S, T> type) {
+        return ListTag.empty();
+    }
 
-	protected String getTagPrefixedToString(String... valueParts) {
-		StringBuilder out = new StringBuilder(32);
-		out.append(getClass().getSimpleName());
-		out.append(name == null ? "" : "(\"" + name + "\")");
-		out.append(": ");
-		for (String valuePart : valueParts)
-			out.append(valuePart);
-		return out.toString();
-	}
+    public DoubleTag asDouble() {
+        return DoubleTag.EMPTY;
+    }
+
+    public FloatTag asFloat() {
+        return FloatTag.EMPTY;
+    }
+
+    public IntArrayTag asIntArray() {
+        return IntArrayTag.EMPTY;
+    }
+
+    public IntTag asInt() {
+        return IntTag.EMPTY;
+    }
+
+    public LongArrayTag asLongArray() {
+        return LongArrayTag.EMPTY;
+    }
+
+    public LongTag asLong() {
+        return LongTag.EMPTY;
+    }
+
+    public ShortTag asShort() {
+        return ShortTag.EMPTY;
+    }
+
+    public StringTag asString() {
+        if (isAbsent()) {
+            return StringTag.EMPTY;
+        }
+        if (getType() == TagType.COMPOUND || getType() == TagType.LIST) {
+            return StringTag.EMPTY;
+        }
+        return Nbt.tag("" + getValue());
+    }
+
+    abstract TagType<V, ?> getType();
+
+    public abstract boolean isPresent();
+
+    public abstract V getValue();
+
+    abstract void writeValue(DataOutput out) throws IOException;
+
+    void writeTo(String name, DataOutput out) throws IOException {
+        out.writeByte(getType().getId());
+
+        byte[] nameBytes = name.getBytes(StringTag.CHARSET);
+        out.writeShort(nameBytes.length);
+        out.write(nameBytes);
+        writeValue(out);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Tag)) return false;
+        Tag tag = (Tag) o;
+        return getType() == tag.getType() && Objects.equals(getValue(), tag.getValue());
+    }
+
+    @Override
+    public String toString() {
+        return getType().getName() + "(" + getValueString() + ")";
+    }
 }

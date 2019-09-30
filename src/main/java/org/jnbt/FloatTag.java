@@ -1,7 +1,5 @@
 package org.jnbt;
 
-//@formatter:off
-
 /*
  * JNBT License
  *
@@ -35,44 +33,64 @@ package org.jnbt;
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-//@formatter:on
-
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.Objects;
 
-/**
- * The {@code TAG_Float} tag.
- *
- * @author Graham Edgecombe
- */
-public final class FloatTag extends Tag {
-	private final float value;
+public final class FloatTag extends NumberTag<Float> {
 
-	public FloatTag(String name, float value) {
-		super(name);
-		this.value = value;
-	}
+    static final FloatTag EMPTY = new FloatTag(0F);
 
-	@Override
-	public Float getValue() { return value; }
+    private final float value;
 
-	/**
-	 * Returns the value without autoboxing.
-	 *
-	 * @since 1.5
-	 */
-	public float floatValue() { return value; }
+    FloatTag(float value) {
+        this.value = value;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (!(obj instanceof FloatTag)) return false;
-		if (!super.equals(obj)) return false;
-		FloatTag floatTag = (FloatTag)obj;
-		return Float.compare(floatTag.value, value) == 0;
-	}
+    FloatTag(float value, TagType type) {
+        this.value = value;
+    }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(super.hashCode(), value);
-	}
+    @Override
+    public boolean isPresent() {
+        return this != EMPTY;
+    }
+
+    @Override
+    public FloatTag asFloat() {
+        return this;
+    }
+
+    @Override
+    public Float getValue() {
+        return value;
+    }
+
+    @Override
+    TagType<Float, FloatTag> getType() {
+        return TagType.FLOAT;
+    }
+
+    @Override
+    void writeValue(DataOutput out) throws IOException {
+        out.writeFloat(value);
+    }
+
+    public float floatValue() {
+        return value;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof FloatTag)) return false;
+        if (!super.equals(obj)) return false;
+        FloatTag floatTag = (FloatTag) obj;
+        return Float.compare(floatTag.value, value) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), value);
+    }
 }

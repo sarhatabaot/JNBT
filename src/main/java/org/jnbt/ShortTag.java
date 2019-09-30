@@ -1,7 +1,5 @@
 package org.jnbt;
 
-//@formatter:off
-
 /*
  * JNBT License
  *
@@ -35,51 +33,64 @@ package org.jnbt;
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-//@formatter:on
-
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.Objects;
 
-/**
- * The {@code TAG_Short} tag.
- *
- * @author Graham Edgecombe
- */
-public final class ShortTag extends Tag {
-	private final short value;
+public final class ShortTag extends NumberTag<Short> {
 
-	public ShortTag(String name, short value) {
-		super(name);
-		this.value = value;
-	}
+    static final ShortTag EMPTY = new ShortTag((short) 0);
 
-	/**
-	 * @since 1.6
-	 */
-	public ShortTag(String name, int value) {
-		this(name, (short)value);
-	}
+    private final short value;
 
-	@Override
-	public Short getValue() { return value; }
+    ShortTag(short value) {
+        this.value = value;
+    }
 
-	/**
-	 * Returns the value without autoboxing.
-	 *
-	 * @since 1.5
-	 */
-	public short shortValue() { return value; }
+    ShortTag(short value, TagType type) {
+        this.value = value;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (!(obj instanceof ShortTag)) return false;
-		if (!super.equals(obj)) return false;
-		ShortTag shortTag = (ShortTag)obj;
-		return value == shortTag.value;
-	}
+    @Override
+    public boolean isPresent() {
+        return this != EMPTY;
+    }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(super.hashCode(), value);
-	}
+    @Override
+    public ShortTag asShort() {
+        return this;
+    }
+
+    @Override
+    public Short getValue() {
+        return value;
+    }
+
+    public short shortValue() {
+        return value;
+    }
+
+    @Override
+    TagType<Short, ShortTag> getType() {
+        return TagType.SHORT;
+    }
+
+    @Override
+    void writeValue(DataOutput out) throws IOException {
+        out.writeShort(value);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ShortTag)) return false;
+        if (!super.equals(obj)) return false;
+        ShortTag shortTag = (ShortTag) obj;
+        return value == shortTag.value;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), value);
+    }
 }

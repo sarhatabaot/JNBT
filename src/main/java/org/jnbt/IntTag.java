@@ -1,7 +1,5 @@
 package org.jnbt;
 
-//@formatter:off
-
 /*
  * JNBT License
  *
@@ -35,44 +33,64 @@ package org.jnbt;
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-//@formatter:on
-
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.Objects;
 
-/**
- * The {@code TAG_Int} tag.
- *
- * @author Graham Edgecombe
- */
-public final class IntTag extends Tag {
-	private final int value;
+public final class IntTag extends NumberTag<Integer> {
 
-	public IntTag(String name, int value) {
-		super(name);
-		this.value = value;
-	}
+    static final IntTag EMPTY = new IntTag(0);
 
-	@Override
-	public Integer getValue() { return value; }
+    private final int value;
 
-	/**
-	 * Returns the value without autoboxing.
-	 *
-	 * @since 1.5
-	 */
-	public int intValue() { return value; }
+    IntTag(int value) {
+        this.value = value;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (!(obj instanceof IntTag)) return false;
-		if (!super.equals(obj)) return false;
-		IntTag intTag = (IntTag)obj;
-		return value == intTag.value;
-	}
+    IntTag(int value, TagType type) {
+        this.value = value;
+    }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(super.hashCode(), value);
-	}
+    @Override
+    public boolean isPresent() {
+        return this != EMPTY;
+    }
+
+    @Override
+    public IntTag asInt() {
+        return this;
+    }
+
+    @Override
+    public Integer getValue() {
+        return value;
+    }
+
+    @Override
+    TagType<Integer, IntTag> getType() {
+        return TagType.INT;
+    }
+
+    @Override
+    void writeValue(DataOutput out) throws IOException {
+        out.writeInt(value);
+    }
+
+    public int intValue() {
+        return value;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof IntTag)) return false;
+        if (!super.equals(obj)) return false;
+        IntTag intTag = (IntTag) obj;
+        return value == intTag.value;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), value);
+    }
 }

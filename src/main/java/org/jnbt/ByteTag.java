@@ -1,7 +1,5 @@
 package org.jnbt;
 
-//@formatter:off
-
 /*
  * JNBT License
  *
@@ -35,51 +33,68 @@ package org.jnbt;
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-//@formatter:on
-
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.Objects;
 
-/**
- * The {@code TAG_Byte} tag.
- *
- * @author Graham Edgecombe
- */
-public final class ByteTag extends Tag {
-	private final byte value;
+public final class ByteTag extends NumberTag<Byte> {
 
-	public ByteTag(String name, byte value) {
-		super(name);
-		this.value = value;
-	}
+    static final ByteTag EMPTY = new ByteTag((byte) 0);
 
-	/**
-	 * @since 1.6
-	 */
-	public ByteTag(String name, int value) {
-		this(name, (byte)value);
-	}
+    private final byte value;
 
-	@Override
-	public Byte getValue() { return value; }
+    ByteTag(byte value) {
+        this.value = value;
+    }
 
-	/**
-	 * Returns the value without autoboxing.
-	 *
-	 * @since 1.5
-	 */
-	public byte byteValue() { return value; }
+    ByteTag(byte value, TagType type) {
+        this.value = value;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (!(obj instanceof ByteTag)) return false;
-		if (!super.equals(obj)) return false;
-		ByteTag byteTag = (ByteTag)obj;
-		return value == byteTag.value;
-	}
+    @Override
+    public ByteTag asByte() {
+        return this;
+    }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(super.hashCode(), value);
-	}
+    @Override
+    public boolean isPresent() {
+        return this != EMPTY;
+    }
+
+    @Override
+    public Byte getValue() {
+        return value;
+    }
+
+    @Override
+    TagType<Byte, ByteTag> getType() {
+        return TagType.BYTE;
+    }
+
+    @Override
+    void writeValue(DataOutput out) throws IOException {
+        out.writeByte(value);
+    }
+
+    public byte byteValue() {
+        return value;
+    }
+
+    public boolean boolValue() {
+        return byteValue() == 1;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof ByteTag)) return false;
+        if (!super.equals(obj)) return false;
+        ByteTag byteTag = (ByteTag) obj;
+        return value == byteTag.value;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), value);
+    }
 }
