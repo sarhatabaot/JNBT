@@ -1,6 +1,13 @@
 plugins {
     id 'java'
+    id 'maven'
 }
 
 group 'org.jnbt'
-version '2.0.4'
+version '2.0.5'
+
+
+javadoc {
+    source = sourceSets.main.allJava
+    classpath = configurations.compile
+}
