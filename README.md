@@ -27,6 +27,15 @@ NBT, or Named Binary Tag, is a file format created by Markus Persson for use wit
 JNBT is a library that can read and write NBT files, written in Java by Graham Edgecombe and available open-source under the BSD license.
 
 --------------
+```xml
+<dependency>
+  <groupId>org.jnbt</groupId>
+  <artifactId>JNBT</artifactId>
+  <version>2.0.5</version>
+</dependency>
+```
+
+--------------
 
 Version History:
 
